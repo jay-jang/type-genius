@@ -97,6 +97,21 @@ export const useAppStore = create<AppState>()(
         const profileId = get().currentProfileId
         if (!profileId) return null
         const session: SessionResult = { ...r, id: uid(), profileId, timestamp: Date.now() }
+
+        // Send to server in the background, catch errors silently for offline resilience
+        const profile = get().profiles.find((p) => p.id === profileId)
+        if (profile) {
+          fetch('/api/sessions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ session, profile }),
+          }).catch((err) => {
+            console.warn('Failed to upload session to server (offline fallback active):', err)
+          })
+        }
+
         set((s) => {
           const raw = [...s.sessions, session]
           return { sessions: raw.slice(-1000) }

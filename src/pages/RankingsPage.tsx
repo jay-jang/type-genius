@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAppStore } from '../store/useAppStore'
-import { leaderboard, scoreUnit, MODE_LABELS } from '../lib/stats'
+import { leaderboard, scoreUnit, MODE_LABELS, type RankRow } from '../lib/stats'
 import { formatTimeAgo } from '../lib/metrics'
 import type { PracticeMode } from '../types'
 
@@ -9,19 +9,58 @@ const MEDALS = ['🥇', '🥈', '🥉']
 
 export function RankingsPage() {
   const [mode, setMode] = useState<PracticeMode>('ko')
+  const [globalRows, setGlobalRows] = useState<RankRow[] | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+
   const sessions = useAppStore((s) => s.sessions)
   const profiles = useAppStore((s) => s.profiles)
   const currentId = useAppStore((s) => s.currentProfileId)
   const now = Date.now()
 
-  const rows = leaderboard(sessions, profiles, mode)
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    setError(false)
+    fetch(`/api/rankings?mode=${mode}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch rankings')
+        return res.json()
+      })
+      .then((data) => {
+        if (active) {
+          setGlobalRows(data)
+          setLoading(false)
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to load global rankings:', err)
+        if (active) {
+          setGlobalRows(null)
+          setError(true)
+          setLoading(false)
+        }
+      })
+    return () => {
+      active = false
+    }
+  }, [mode])
+
+  const localRows = leaderboard(sessions, profiles, mode)
+  const isGlobal = globalRows !== null
+  const rows = globalRows ?? localRows
   const unit = scoreUnit(mode)
   const myRank = rows.findIndex((r) => r.profile.id === currentId)
 
   return (
     <div className="screen rankings">
       <div className="page-head">
-        <h1 className="page-title">🏆 랭킹</h1>
+        <h1 className="page-title">
+          🏆 랭킹
+          <span className={`rank-badge ${isGlobal ? 'global' : 'local'}`}>
+            {isGlobal ? 'Global' : 'Local'}
+          </span>
+        </h1>
         <div className="seg">
           {MODES.map((m) => (
             <button key={m} className={`seg-btn ${mode === m ? 'on' : ''}`} aria-pressed={mode === m} onClick={() => setMode(m)}>
@@ -34,6 +73,8 @@ export function RankingsPage() {
       <p className="rank-note">
         {MODE_LABELS[mode]} 공간의 프로필별 최고 기록입니다. (단위: {unit})
         {myRank >= 0 && <strong> · 내 순위 {myRank + 1}위</strong>}
+        {loading && <span style={{ marginLeft: '8px', color: 'var(--main)' }}>· 불러오는 중...</span>}
+        {error && <span style={{ marginLeft: '8px', color: '#ff5c8a' }}>· 서버 연결 실패 (로컬 모드)</span>}
       </p>
 
       {rows.length === 0 ? (

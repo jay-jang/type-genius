@@ -8,7 +8,7 @@
 // no-cache, and falls back to index.html for unknown non-asset routes (SPA).
 
 import { createServer } from 'node:http'
-import { readFile, stat } from 'node:fs/promises'
+import { readFile, stat, mkdir, writeFile } from 'node:fs/promises'
 import { join, extname, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -47,8 +47,118 @@ function resolvePath(urlPath) {
   return full
 }
 
+const DB_DIR = join(fileURLToPath(new URL('.', import.meta.url)), 'server-data')
+const DB_FILE = join(DB_DIR, 'db.json')
+
+let dbCache = null
+
+async function loadDb() {
+  if (dbCache) return dbCache
+  try {
+    await mkdir(DB_DIR, { recursive: true })
+    const data = await readFile(DB_FILE, 'utf8')
+    dbCache = JSON.parse(data)
+  } catch {
+    dbCache = { sessions: [], profiles: [] }
+  }
+  return dbCache
+}
+
+async function saveDb() {
+  if (!dbCache) return
+  await mkdir(DB_DIR, { recursive: true })
+  await writeFile(DB_FILE, JSON.stringify(dbCache, null, 2), 'utf8')
+}
+
+async function handleApi(req, res) {
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`)
+  
+  if (req.method === 'POST' && url.pathname === '/api/sessions') {
+    let bodyStr = ''
+    req.on('data', chunk => { bodyStr += chunk })
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(bodyStr)
+        if (!payload.session || !payload.profile) {
+          res.writeHead(400, { 'Content-Type': 'application/json' })
+          return res.end(JSON.stringify({ error: 'Missing session or profile payload' }))
+        }
+        
+        const db = await loadDb()
+        
+        // Add session
+        db.sessions.push(payload.session)
+        // Keep last 5000 sessions total on the server to prevent massive bloat
+        if (db.sessions.length > 5000) {
+          db.sessions = db.sessions.slice(-5000)
+        }
+        
+        // Add/Update profile
+        const profIdx = db.profiles.findIndex(p => p.id === payload.profile.id)
+        if (profIdx >= 0) {
+          db.profiles[profIdx] = payload.profile
+        } else {
+          db.profiles.push(payload.profile)
+        }
+        
+        await saveDb()
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ success: true }))
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify({ error: err.message }))
+      }
+    })
+    return
+  }
+  
+  if (req.method === 'GET' && url.pathname === '/api/rankings') {
+    try {
+      const mode = url.searchParams.get('mode') || 'ko'
+      const db = await loadDb()
+      
+      // Compute leaderboard on the server
+      const rows = []
+      for (const profile of db.profiles) {
+        const mine = db.sessions.filter((s) => s.profileId === profile.id && s.mode === mode && !s.isDrill)
+        if (mine.length === 0) continue
+        
+        const sessionScore = (s) => (s.mode === 'ko' ? s.cpm : s.wpm)
+        const best = Math.max(...mine.map(sessionScore))
+        const bestAccuracy = Math.max(...mine.map((s) => s.accuracy))
+        const lastPlayed = Math.max(...mine.map((s) => s.timestamp))
+        
+        rows.push({
+          profile,
+          best,
+          bestAccuracy,
+          sessions: mine.length,
+          lastPlayed
+        })
+      }
+      
+      // Sort descending by best score
+      rows.sort((a, b) => b.best - a.best)
+      
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(rows))
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify({ error: err.message }))
+    }
+    return
+  }
+  
+  res.writeHead(404, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify({ error: 'API Not Found' }))
+}
+
 const server = createServer(async (req, res) => {
   try {
+    if (req.url.startsWith('/api/')) {
+      return handleApi(req, res)
+    }
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.writeHead(405, { Allow: 'GET, HEAD' })
       return res.end('Method Not Allowed')
