@@ -22,7 +22,7 @@ export function TopBar() {
 
   return (
     <header className="topbar">
-      <button className="logo" onClick={goHome} title="새 테스트">
+      <button className="logo" onClick={goHome} title="홈">
         <IconKeyboard size={22} className="logo-mark" />
         <span className="logo-name">
           type<span className="logo-accent">genius</span>
@@ -30,7 +30,7 @@ export function TopBar() {
       </button>
 
       <nav className="topnav">
-        <button className={`navbtn ${screen === 'practice' ? 'on' : ''}`} onClick={goHome} title="새 테스트" aria-label="새 테스트">
+        <button className={`navbtn ${screen === 'home' ? 'on' : ''}`} onClick={goHome} title="홈" aria-label="홈">
           <IconHome />
         </button>
         <button className={`navbtn ${screen === 'library' ? 'on' : ''}`} onClick={() => openLibrary()} title="글 고르기" aria-label="글 고르기">

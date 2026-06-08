@@ -4,7 +4,7 @@ import type { EngineResult } from '../hooks/useTypingEngine'
 import { pickRandom } from '../data'
 import { useAppStore } from '../store/useAppStore'
 
-export type Screen = 'practice' | 'library' | 'results' | 'rankings' | 'profile'
+export type Screen = 'home' | 'practice' | 'library' | 'results' | 'rankings' | 'profile'
 
 export interface TestConfig {
   mode: PracticeMode
@@ -82,7 +82,7 @@ const DEFAULT_CONFIG: TestConfig = { mode: 'ko', genre: 'all', difficulty: 'all'
 export function NavProvider({ children }: { children: ReactNode }) {
   const recordSession = useAppStore((s) => s.recordSession)
 
-  const [screen, setScreen] = useState<Screen>('practice')
+  const [screen, setScreen] = useState<Screen>('home')
   const [config, setConfigState] = useState<TestConfig>(DEFAULT_CONFIG)
   const [queue, setQueue] = useState<string[]>(() => {
     const p = pickFor(DEFAULT_CONFIG)
@@ -119,7 +119,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
   )
 
   const reroll = useCallback(() => startWith(config, queue[index]), [startWith, config, queue, index])
-  const goHome = useCallback(() => reroll(), [reroll])
+  const goHome = useCallback(() => setScreen('home'), [])
 
   const openLibrary = useCallback((space?: PracticeMode) => {
     if (space) setConfigState((prev) => ({ ...prev, mode: space }))

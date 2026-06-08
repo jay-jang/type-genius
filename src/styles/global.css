@@ -1246,6 +1246,296 @@ kbd {
   color: var(--sub);
 }
 
+/* ----------------------------------------------------------------- home --- */
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  padding-top: 3rem;
+  text-align: center;
+}
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.home-logo {
+  font-size: 2.7rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin: 0;
+}
+.home-logo span {
+  color: var(--main);
+}
+.home-tag {
+  color: var(--sub);
+  font-size: 1rem;
+  margin: 0;
+}
+.space-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 560px;
+}
+.space-card {
+  background: var(--sub-alt);
+  border: 2px solid transparent;
+  border-radius: var(--round);
+  padding: 1.4rem 1rem;
+  cursor: pointer;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  transition: border-color 0.15s, transform 0.08s, background 0.15s;
+}
+.space-card:hover {
+  transform: translateY(-3px);
+}
+.space-card.on {
+  border-color: var(--main);
+  background: color-mix(in srgb, var(--main) 12%, var(--sub-alt));
+}
+.sc-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.space-card.on .sc-name {
+  color: var(--main);
+}
+.sc-count {
+  font-size: 0.8rem;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.home-actions {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn.lg {
+  padding: 0.85em 1.7em;
+  font-size: 1.05rem;
+}
+.home-summary,
+.home-hint {
+  color: var(--sub);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+.home-summary b {
+  color: var(--main);
+  font-weight: 700;
+}
+.home-hint {
+  opacity: 0.8;
+}
+
+/* ----------------------------------------------------- library deck (cards) */
+.deck {
+  display: flex;
+  align-items: stretch;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.deck-nav {
+  flex: none;
+  width: 44px;
+  border: none;
+  background: var(--sub-alt);
+  color: var(--sub);
+  border-radius: var(--round);
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.deck-nav:hover {
+  color: var(--bg);
+  background: var(--main);
+}
+.deck-stage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  touch-action: pan-y;
+}
+/* faux stacked cards behind, for the "deck" affordance */
+.deck-stage::before,
+.deck-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--round);
+  background: var(--sub-alt);
+  z-index: 0;
+}
+.deck-stage::before {
+  transform: translateY(7px) scale(0.965);
+  opacity: 0.5;
+}
+.deck-stage::after {
+  transform: translateY(14px) scale(0.93);
+  opacity: 0.25;
+}
+.deck-card {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: var(--sub-alt);
+  border-radius: var(--round);
+  padding: 1.5rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-height: 240px;
+}
+.deck-card.in-right {
+  animation: deckInRight 0.22s ease;
+}
+.deck-card.in-left {
+  animation: deckInLeft 0.22s ease;
+}
+.dc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dc-genre {
+  font-size: 0.82rem;
+  color: var(--sub);
+  font-weight: 600;
+}
+.dc-diff {
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.dc-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.dc-author {
+  font-size: 0.9rem;
+  color: var(--sub);
+}
+.dc-preview {
+  margin: 0.2rem 0 auto;
+  font-size: 0.95rem;
+  color: var(--sub);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.dc-meta {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.deck-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 1rem 0 0.2rem;
+}
+.deck-dots {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.deck-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sub);
+  opacity: 0.4;
+  transition: opacity 0.15s, background 0.15s;
+}
+.deck-dots i.on {
+  background: var(--main);
+  opacity: 1;
+}
+.deck-count {
+  color: var(--sub);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+.deck-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.8rem;
+}
+@keyframes deckInRight {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes deckInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@media (max-width: 760px) {
+  .home {
+    padding-top: 1.5rem;
+  }
+  .home-logo {
+    font-size: 2rem;
+  }
+  .space-cards {
+    gap: 0.5rem;
+  }
+  .space-card {
+    padding: 1rem 0.5rem;
+  }
+  .sc-name {
+    font-size: 1rem;
+  }
+  .deck-nav {
+    width: 36px;
+    font-size: 1.4rem;
+  }
+  .deck-card {
+    padding: 1.2rem 1.1rem;
+    min-height: 200px;
+  }
+  .dc-title {
+    font-size: 1.25rem;
+  }
+}
+
 /* ----------------------------------------------------------------- chart -- */
 .linechart {
   width: 100%;

@@ -5,6 +5,7 @@ import { sound } from './lib/sound'
 import { isValidTheme, DEFAULT_THEME } from './data/themes'
 import { TopBar } from './components/TopBar'
 import { BottomBar } from './components/BottomBar'
+import { HomePage } from './pages/HomePage'
 import { PracticePage } from './pages/PracticePage'
 import { LibraryPage } from './pages/LibraryPage'
 import { ResultsPage } from './pages/ResultsPage'
@@ -14,6 +15,8 @@ import { ProfilePage } from './pages/ProfilePage'
 function Screens() {
   const { screen } = useNav()
   switch (screen) {
+    case 'home':
+      return <HomePage />
     case 'library':
       return <LibraryPage />
     case 'results':

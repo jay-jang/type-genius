@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNav } from '../app/nav'
 import {
   passagesFor,
   GENRE_LABELS,
-  GENRE_ICONS,
   GENRES,
   DIFFICULTY_LABELS,
   LANGUAGE_LABELS,
@@ -12,11 +11,16 @@ import { MODE_LABELS } from '../lib/stats'
 import { countStrokes } from '../lib/hangul'
 import type { Difficulty, Genre } from '../types'
 
+const PREVIEW_MAX = 220
+
 export function LibraryPage() {
-  const { space, startPassage, startMixed, startRandom, goHome } = useNav()
+  const { space, startPassage, goHome } = useNav()
   const [genre, setGenre] = useState<Genre | 'all'>('all')
   const [difficulty, setDifficulty] = useState<Difficulty | 'all'>('all')
   const [q, setQ] = useState('')
+  const [idx, setIdx] = useState(0)
+  const [dir, setDir] = useState(1)
+  const touchX = useRef<number | null>(null)
 
   const language = space === 'mixed' ? undefined : space
 
@@ -38,6 +42,42 @@ export function LibraryPage() {
     return items
   }, [language, genre, difficulty, q])
 
+  // The deck resets to the first card whenever the filtered set changes.
+  useEffect(() => setIdx(0), [language, genre, difficulty, q])
+
+  const n = list.length
+  const curIdx = n ? Math.min(idx, n - 1) : 0
+  const cur = list[curIdx]
+
+  const go = (d: number) => {
+    if (n === 0) return
+    setDir(d)
+    setIdx((i) => (Math.min(i, n - 1) + d + n) % n)
+  }
+  const shuffle = () => {
+    if (n <= 1) return
+    setDir(1)
+    setIdx((i) => {
+      let r = i
+      while (r === i) r = Math.floor(Math.random() * n)
+      return r
+    })
+  }
+
+  // Keyboard deck control; ignore while the search box is focused.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement)?.tagName === 'INPUT') return
+      if (e.key === 'ArrowLeft') go(-1)
+      else if (e.key === 'ArrowRight') go(1)
+      else if (e.key === 'Enter') {
+        if (cur) startPassage(cur.id, space)
+      } else if (e.key.toLowerCase() === 's') shuffle()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
+
   return (
     <div className="screen library">
       <div className="page-head">
@@ -46,19 +86,13 @@ export function LibraryPage() {
             ← 홈
           </button>
           <h1 className="page-title">
-            {MODE_LABELS[space]} 도서관 <span className="muted">· {list.length}편</span>
+            {MODE_LABELS[space]} 도서관 <span className="muted">· {n}편</span>
           </h1>
         </div>
         <div className="page-head-actions">
-          {space === 'mixed' ? (
-            <button className="btn primary" onClick={() => startMixed()}>
-              🔀 복합 연습 시작
-            </button>
-          ) : (
-            <button className="btn primary" onClick={() => startRandom(space)}>
-              🎲 랜덤 시작
-            </button>
-          )}
+          <button className="btn" onClick={shuffle} disabled={n <= 1} title="무작위 글 (S)">
+            셔플 ↻
+          </button>
         </div>
       </div>
 
@@ -75,7 +109,7 @@ export function LibraryPage() {
           </button>
           {GENRES.map((g) => (
             <button key={g} className={`chip ${genre === g ? 'on' : ''}`} onClick={() => setGenre(g)}>
-              {GENRE_ICONS[g]} {GENRE_LABELS[g]}
+              {GENRE_LABELS[g]}
             </button>
           ))}
         </div>
@@ -98,36 +132,69 @@ export function LibraryPage() {
         </div>
       </div>
 
-      {list.length === 0 ? (
+      {!cur ? (
         <p className="empty-msg">조건에 맞는 글이 없어요.</p>
       ) : (
-        <div className="passage-grid">
-          {list.map((p) => {
-            const chars = p.text.replace(/[\n\r]/g, '').length
-            const strokes = p.language === 'ko' ? countStrokes(p.text) : chars
-            return (
-              <button key={p.id} className="passage-card" onClick={() => startPassage(p.id, space)}>
-                <div className="pc-top">
-                  <span className={`pc-genre`}>
-                    {GENRE_ICONS[p.genre]} {GENRE_LABELS[p.genre]}
-                  </span>
-                  <span className={`pc-diff diff-${p.difficulty}`}>{DIFFICULTY_LABELS[p.difficulty]}</span>
+        <>
+          <div className="deck">
+            <button className="deck-nav" onClick={() => go(-1)} aria-label="이전 글">
+              ‹
+            </button>
+            <div
+              className="deck-stage"
+              onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
+              onTouchEnd={(e) => {
+                if (touchX.current == null) return
+                const dx = e.changedTouches[0].clientX - touchX.current
+                touchX.current = null
+                if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1)
+              }}
+            >
+              <article key={cur.id} className={`deck-card ${dir > 0 ? 'in-right' : 'in-left'}`}>
+                <div className="dc-top">
+                  <span className="dc-genre">{GENRE_LABELS[cur.genre]}</span>
+                  <span className={`dc-diff diff-${cur.difficulty}`}>{DIFFICULTY_LABELS[cur.difficulty]}</span>
                 </div>
-                <div className="pc-title">{p.title}</div>
-                <div className="pc-author">
-                  {p.author}
-                  {space === 'mixed' && <span className="pc-lang"> · {LANGUAGE_LABELS[p.language]}</span>}
+                <div className="dc-title">{cur.title}</div>
+                <div className="dc-author">
+                  {cur.author}
+                  {space === 'mixed' && <span className="pc-lang"> · {LANGUAGE_LABELS[cur.language]}</span>}
                 </div>
-                <div className="pc-preview">{p.text.replace(/\n+/g, ' ').slice(0, 70)}…</div>
-                <div className="pc-meta">
-                  <span>{chars}자</span>
+                <p className="dc-preview">
+                  {cur.text.trim().slice(0, PREVIEW_MAX)}
+                  {cur.text.trim().length > PREVIEW_MAX ? '…' : ''}
+                </p>
+                <div className="dc-meta">
+                  <span>{cur.text.replace(/[\n\r]/g, '').length}자</span>
                   <span>·</span>
-                  <span>{strokes}타</span>
+                  <span>{cur.language === 'ko' ? countStrokes(cur.text) : cur.text.replace(/[\n\r]/g, '').length}타</span>
                 </div>
-              </button>
-            )
-          })}
-        </div>
+              </article>
+            </div>
+            <button className="deck-nav" onClick={() => go(1)} aria-label="다음 글">
+              ›
+            </button>
+          </div>
+
+          <div className="deck-foot">
+            {n <= 12 && (
+              <div className="deck-dots" aria-hidden="true">
+                {list.map((_, i) => (
+                  <i key={i} className={i === curIdx ? 'on' : ''} />
+                ))}
+              </div>
+            )}
+            <span className="deck-count">
+              {curIdx + 1} / {n}
+            </span>
+          </div>
+
+          <div className="deck-actions">
+            <button className="btn primary lg" onClick={() => startPassage(cur.id, space)}>
+              ▶ 이 글로 시작
+            </button>
+          </div>
+        </>
       )}
     </div>
   )
