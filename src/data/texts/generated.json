@@ -1,0 +1,506 @@
+[
+  {
+    "id": "ko-poem-azaleas",
+    "language": "ko",
+    "genre": "poem",
+    "title": "진달래꽃",
+    "author": "김소월",
+    "difficulty": "medium",
+    "text": "나 보기가 역겨워\n가실 때에는\n말없이 고이 보내 드리오리다.\n\n영변에 약산\n진달래꽃\n아름 따다 가실 길에 뿌리오리다.\n\n가시는 걸음 걸음\n놓인 그 꽃을\n사뿐히 즈려밟고 가시옵소서.\n\n나 보기가 역겨워\n가실 때에는\n죽어도 아니 눈물 흘리오리다."
+  },
+  {
+    "id": "ko-poem-seosi",
+    "language": "ko",
+    "genre": "poem",
+    "title": "서시",
+    "author": "윤동주",
+    "difficulty": "easy",
+    "text": "죽는 날까지 하늘을 우러러\n한 점 부끄럼이 없기를,\n잎새에 이는 바람에도\n나는 괴로워했다.\n별을 노래하는 마음으로\n모든 죽어 가는 것을 사랑해야지\n그리고 나한테 주어진 길을\n걸어가야겠다.\n\n오늘 밤에도 별이 바람에 스치운다."
+  },
+  {
+    "id": "ko-poem-nimui-chimmuk",
+    "language": "ko",
+    "genre": "poem",
+    "title": "님의 침묵",
+    "author": "한용운",
+    "difficulty": "hard",
+    "text": "님은 갔습니다. 아아, 사랑하는 나의 님은 갔습니다.\n푸른 산빛을 깨치고 단풍나무 숲을 향하여 난 작은 길을 걸어서, 차마 떨치고 갔습니다.\n황금의 꽃같이 굳고 빛나던 옛 맹세는 차디찬 티끌이 되어서 한숨의 미풍에 날아갔습니다.\n날카로운 첫 키스의 추억은 나의 운명의 지침을 돌려 놓고, 뒷걸음쳐서 사라졌습니다.\n나는 향기로운 님의 말소리에 귀먹고, 꽃다운 님의 얼굴에 눈멀었습니다.\n사랑도 사람의 일이라, 만날 때에 미리 떠날 것을 염려하고 경계하지 아니한 것은 아니지만, 이별은 뜻밖의 일이 되고, 놀란 가슴은 새로운 슬픔에 터집니다.\n그러나 이별을 쓸데없는 눈물의 원천을 만들고 마는 것은 스스로 사랑을 깨치는 것인 줄 아는 까닭에, 걷잡을 수 없는 슬픔의 힘을 옮겨서 새 희망의 정수박이에 들어부었습니다.\n우리는 만날 때에 떠날 것을 염려하는 것과 같이, 떠날 때에 다시 만날 것을 믿습니다.\n아아, 님은 갔지마는 나는 님을 보내지 아니하였습니다.\n제 곡조를 못 이기는 사랑의 노래는 님의 침묵을 휩싸고 돕니다."
+  },
+  {
+    "id": "ko-poem-byeol-heneun-bam",
+    "language": "ko",
+    "genre": "poem",
+    "title": "별 헤는 밤",
+    "author": "윤동주",
+    "difficulty": "hard",
+    "text": "계절이 지나가는 하늘에는\n가을로 가득 차 있습니다.\n\n나는 아무 걱정도 없이\n가을 속의 별들을 다 헤일 듯합니다.\n\n가슴속에 하나둘 새겨지는 별을\n이제 다 못 헤는 것은\n쉬이 아침이 오는 까닭이요,\n내일 밤이 남은 까닭이요,\n아직 나의 청춘이 다하지 않은 까닭입니다.\n\n별 하나에 추억과\n별 하나에 사랑과\n별 하나에 쓸쓸함과\n별 하나에 동경과\n별 하나에 시와\n별 하나에 어머니, 어머니,\n\n어머님, 나는 별 하나에 아름다운 말 한마디씩 불러 봅니다."
+  },
+  {
+    "id": "ko-poem-hyangsu",
+    "language": "ko",
+    "genre": "poem",
+    "title": "향수",
+    "author": "정지용",
+    "difficulty": "hard",
+    "text": "넓은 벌 동쪽 끝으로\n옛이야기 지줄대는 실개천이 회돌아 나가고,\n얼룩백이 황소가\n해설피 금빛 게으른 울음을 우는 곳,\n\n-- 그곳이 차마 꿈엔들 잊힐 리야.\n\n질화로에 재가 식어지면\n비인 밭에 밤바람 소리 말을 달리고,\n엷은 졸음에 겨운 늙으신 아버지가\n짚베개를 돋아 고이시는 곳,\n\n-- 그곳이 차마 꿈엔들 잊힐 리야.\n\n흙에서 자란 내 마음\n파아란 하늘빛이 그리워\n함부로 쏜 화살을 찾으려\n풀섶 이슬에 함초롬 휘적시던 곳,\n\n-- 그곳이 차마 꿈엔들 잊힐 리야."
+  },
+  {
+    "id": "ko-poem-kkot",
+    "language": "ko",
+    "genre": "poem",
+    "title": "꽃",
+    "author": "김춘수",
+    "difficulty": "medium",
+    "text": "내가 그의 이름을 불러 주기 전에는\n그는 다만\n하나의 몸짓에 지나지 않았다.\n\n내가 그의 이름을 불러 주었을 때\n그는 나에게로 와서\n꽃이 되었다.\n\n내가 그의 이름을 불러 준 것처럼\n나의 이 빛깔과 향기에 알맞은\n누가 나의 이름을 불러 다오.\n그에게로 가서 나도\n그의 꽃이 되고 싶다.\n\n우리들은 모두\n무엇이 되고 싶다.\n너는 나에게 나는 너에게\n잊혀지지 않는 하나의 눈짓이 되고 싶다."
+  },
+  {
+    "id": "ko-poem-seungmu",
+    "language": "ko",
+    "genre": "poem",
+    "title": "승무",
+    "author": "조지훈",
+    "difficulty": "medium",
+    "text": "얇은 사 하이얀 고깔은\n고이 접어서 나빌레라.\n\n파르라니 깎은 머리\n박사 고깔에 감추오고,\n\n두 볼에 흐르는 빛이\n정작으로 고와서 서러워라.\n\n빈 대에 황촉불이 말없이 녹는 밤에\n오동잎 잎새마다 달이 지는데,\n\n소매는 길어서 하늘은 넓고,\n돌아설 듯 날아가며 사뿐히 접어 올린 외씨버선이여."
+  },
+  {
+    "id": "ko-poem-hoj-pyo",
+    "language": "ko",
+    "genre": "poem",
+    "title": "엄마야 누나야",
+    "author": "김소월",
+    "difficulty": "easy",
+    "text": "엄마야 누나야 강변 살자,\n뜰에는 반짝이는 금모래빛,\n뒷문 밖에는 갈잎의 노래,\n엄마야 누나야 강변 살자."
+  },
+  {
+    "id": "ko-novel-sonagi-opening",
+    "language": "ko",
+    "genre": "novel",
+    "title": "소나기",
+    "author": "황순원",
+    "difficulty": "easy",
+    "text": "소년은 개울가에서 소녀를 보자 곧 윤 초시네 증손녀(曾孫女)딸이라는 걸 알 수 있었다. 소녀는 개울에다 손을 잠그고 물장난을 하고 있는 것이다. 서울서는 이런 개울물을 보지 못하기나 한 듯이."
+  },
+  {
+    "id": "ko-novel-memil-moonlight",
+    "language": "ko",
+    "genre": "novel",
+    "title": "메밀꽃 필 무렵",
+    "author": "이효석",
+    "difficulty": "hard",
+    "text": "이지러는 졌으나 보름을 가제 지난 달은 부드러운 빛을 흐붓이 흘리고 있다. 대화까지는 칠십 리의 밤길, 고개를 둘이나 넘고 개울을 하나 건너고, 벌판과 산길을 걸어야 된다. 길은 지금 긴 산허리에 걸려 있다. 밤중을 지난 무렵인지 죽은 듯이 고요한 속에서 짐승 같은 달의 숨소리가 손에 잡힐 듯이 들리며, 콩 포기와 옥수수 잎새가 한층 달에 푸르게 젖었다. 산허리는 온통 메밀밭이어서 피기 시작한 꽃이 소금을 뿌린 듯이 흐붓한 달빛에 숨이 막힐 지경이다."
+  },
+  {
+    "id": "ko-novel-mujin-fog",
+    "language": "ko",
+    "genre": "novel",
+    "title": "무진기행",
+    "author": "김승옥",
+    "difficulty": "hard",
+    "text": "무진에 명산물이 없는 게 아니다. 나는 그것이 무엇인지 알고 있다. 그것은 안개다. 아침에 잠자리에서 일어나서 밖으로 나오면, 밤사이에 진주해 온 적군들처럼 안개가 무진을 삥 둘러싸고 있는 것이었다. 무진을 둘러싸고 있는 산들도 안개에 의하여 보이지 않는 먼 곳으로 유배당해 버리고 없었다. 안개는 마치 이승에 한이 있어서 매일 밤 찾아오는 여귀가 뿜어 내놓은 입김과 같았다. 해가 떠오르고, 바람이 바다 쪽에서 방향을 바꾸어 불어오기 전에는 사람들의 힘으로써는 그것을 헤쳐 버릴 수가 없었다."
+  },
+  {
+    "id": "ko-novel-bombom-opening",
+    "language": "ko",
+    "genre": "novel",
+    "title": "봄봄",
+    "author": "김유정",
+    "difficulty": "medium",
+    "text": "\"장인님! 인제 저 ......\"\n내가 이렇게 뒤통수를 긁고 나이가 찼으니 성례를 시켜 줘야 하지 않겠느냐고 하면 그 대답이 늘, \"이 자식아! 성례구 뭐구 미처 자라야지!\" 하고 만다. 이 자라야 한다는 것은 내가 아니라 점순이가 자라야 한다는 것이다. 점순이는 올해 열여섯인데 몸은 작다. 그러나 점순이의 키 자라는 것은 보지 않고 자꾸 성례만 시켜 달라고 보챈다고 하니 딱한 노릇이 아닐 수 없다."
+  },
+  {
+    "id": "ko-novel-unsu-good-day",
+    "language": "ko",
+    "genre": "novel",
+    "title": "운수 좋은 날",
+    "author": "현진건",
+    "difficulty": "medium",
+    "text": "새침하게 흐린 품이 눈이 올 듯하더니 눈은 아니 오고 얼다가 만 비가 추적추적 내리는 날이었다. 이날이야말로 동소문 안에서 인력거꾼 노릇을 하는 김 첨지에게는 오래간만에도 닥친 운수 좋은 날이었다. 문안에 (거기도 문밖은 아니지만) 들어간다는 앞집 마마님을 전찻길까지 모셔다 드린 것을 비롯으로 행여나 손님이 있을까 하고 정류장에서 어정어정하며 내리는 사람 하나하나에게 거의 비는 듯한 눈결을 보내고 있다가 마침내 그 칠팔십 전 외에 일 원 오십 전을 손에 쥐게 되었다."
+  },
+  {
+    "id": "ko-novel-baengnyeon-loneliness",
+    "language": "ko",
+    "genre": "novel",
+    "title": "날개",
+    "author": "이상",
+    "difficulty": "medium",
+    "text": "나는 그 33번지 18가구의 낮을 매우 사랑하였다. 낮에는 거의 모든 사람이 나가 버린 까닭에 한산한 것이 정말 좋았다. 나는 어둑어둑한 방 안에 누워서 사람들이 떠드는 소리를 멀리 들으며 한없이 게으른 생각을 하는 것이 좋았다. 나는 거울을 꺼내 본다. 그러나 거울 속의 나는 늘 나를 향하여 외면하고 있었다. 그러나 나는 그것을 오히려 다행으로 여겼다. 나는 내가 죽어 버린 다음의 일을 생각하기를 즐겨하였다."
+  },
+  {
+    "id": "ko-novel-gamja-bok-nyeo",
+    "language": "ko",
+    "genre": "novel",
+    "title": "감자",
+    "author": "김동인",
+    "difficulty": "medium",
+    "text": "싸움, 간통, 살인, 도둑, 구걸, 징역, 이 세상의 모든 비극과 활극의 근원지인, 칠성문 밖 빈민굴로 오기 전까지 복녀의 부처는 (사농공상의 제2위에 드는) 농민이었다. 복녀는 원래 가난은 하나마 정직한 농가에서 규칙 있게 자라난 처녀였다. 그가 열다섯 살 나는 해에 동네 홀아비에게 팔십 원에 팔려서 시집이라는 것을 갔다. 그의 새서방(영감이라는 편이 적당할까)이라는 사람은 그보다 이십 년이나 위로서, 원래 아버지의 시대에는 상당한 농군이었었다."
+  },
+  {
+    "id": "ko-novel-bunyeo-river",
+    "language": "ko",
+    "genre": "novel",
+    "title": "동백꽃",
+    "author": "김유정",
+    "difficulty": "easy",
+    "text": "오늘도 또 우리 수탉이 막 쪼이었다. 내가 점심을 먹고 나무를 하러 갈 양으로 나올 때이었다. 산으로 올라서려니까 등 뒤에서 푸드득푸드득 하고 닭의 횃소리가 야단이다. 깜짝 놀라서 고개를 돌려 보니 아니나 다르랴 두 놈이 또 얼리었다."
+  },
+  {
+    "id": "ko-song-arirang",
+    "language": "ko",
+    "genre": "song",
+    "title": "아리랑",
+    "author": "전통/미상",
+    "difficulty": "easy",
+    "text": "아리랑 아리랑 아라리요\n아리랑 고개로 넘어간다\n나를 버리고 가시는 님은\n십 리도 못 가서 발병 난다"
+  },
+  {
+    "id": "ko-song-gohyangui-bom",
+    "language": "ko",
+    "genre": "song",
+    "title": "고향의 봄",
+    "author": "이원수 작사, 홍난파 작곡",
+    "difficulty": "easy",
+    "text": "나의 살던 고향은 꽃 피는 산골\n복숭아꽃 살구꽃 아기 진달래\n울긋불긋 꽃 대궐 차린 동네\n그 속에서 놀던 때가 그립습니다"
+  },
+  {
+    "id": "ko-song-bandal",
+    "language": "ko",
+    "genre": "song",
+    "title": "반달",
+    "author": "윤극영",
+    "difficulty": "easy",
+    "text": "푸른 하늘 은하수 하얀 쪽배엔\n계수나무 한 나무 토끼 한 마리\n돛대도 아니 달고 삿대도 없이\n가기도 잘도 간다 서쪽 나라로"
+  },
+  {
+    "id": "ko-song-bom-bom-bom",
+    "language": "ko",
+    "genre": "song",
+    "title": "봄봄봄",
+    "author": "로이킴",
+    "difficulty": "medium",
+    "text": "봄 봄 봄 봄이 왔네요\n우리가 처음 만났던 그때의 향기 그대로\n그대가 앉아있던 그 벤치 옆에 나무도\n아직도 남아있네요\n그대를 기억할게요\n사랑이 와요 그대여\n잊지 못해 다시 또 오고야 마는\n그대여 보고 싶어요\n또 한 번 그대를 안고 싶어요\n그대 곁에 있고 싶어요"
+  },
+  {
+    "id": "ko-song-nage-oneun-gil",
+    "language": "ko",
+    "genre": "song",
+    "title": "벚꽃 엔딩",
+    "author": "버스커 버스커",
+    "difficulty": "medium",
+    "text": "그대여 그대여 그대여 그대여 그대여\n오늘은 우리 같이 걸어요 이 거리를\n밤에 들려오는 자장노래 어떤가요\n몰랐던 그대와 단둘이 손잡고\n알 수 없는 이 떨림과 둘이 걸어요\n봄바람 휘날리며 흩날리는 벚꽃 잎이\n울려 퍼질 이 거리를 둘이 걸어요"
+  },
+  {
+    "id": "ko-song-achim-iseul",
+    "language": "ko",
+    "genre": "song",
+    "title": "아침 이슬",
+    "author": "김민기",
+    "difficulty": "medium",
+    "text": "긴 밤 지새우고 풀잎마다 맺힌\n진주보다 더 고운 아침 이슬처럼\n내 맘에 설움이 알알이 맺힐 때\n아침 동산에 올라 작은 미소를 배운다\n태양은 묘지 위에 붉게 떠오르고\n한낮에 찌는 더위는 나의 시련일지라\n나 이제 가노라 저 거친 광야에\n서러움 모두 버리고 나 이제 가노라"
+  },
+  {
+    "id": "ko-song-dont-worry-replace",
+    "language": "ko",
+    "genre": "song",
+    "title": "내 나이가 어때서",
+    "author": "오승근",
+    "difficulty": "hard",
+    "text": "야 야 야 내 나이가 어때서\n사랑에 나이가 있나요\n마음은 하나요 느낌도 하나요\n그대만이 정말 내 사랑인데\n눈물이 나네요 내 나이가 어때서\n사랑하기 딱 좋은 나인데\n어느 날 우연히 거울 속에 비춰진\n내 모습을 바라보면서\n세월아 비켜라 내 나이가 어때서\n사랑하기 딱 좋은 나인데\n야 야 야 내 나이가 어때서\n사랑에 나이가 있나요\n마음은 하나요 느낌도 하나요\n그대만이 정말 내 사랑인데\n눈물이 나네요 내 나이가 어때서\n사랑하기 딱 좋은 나인데"
+  },
+  {
+    "id": "ko-song-seoul-of-the-moon",
+    "language": "ko",
+    "genre": "song",
+    "title": "서울의 달",
+    "author": "김건모",
+    "difficulty": "hard",
+    "text": "저 별은 나의 별 저 별은 너의 별\n별빛에 물든 밤같이 까만 눈동자\n저 별은 나의 별 저 별은 너의 별\n아침 이슬 더 풀잎새 우리 둘이 자고 가는 길\n저 멀리 동그라미 그림보다 더 진하게\n초저녁별 빛나는 마음에 빛난 우리들의 별\n오늘 밤도 수많은 별들이 반짝이고\n남 모를 그리움에 나는 잠이 들고\n어둠이 가득한 이 거리에 달빛 흐르면\n외로운 내 가슴에 너의 모습 떠오르고\n저 별은 나의 별 저 별은 너의 별\n별빛에 물든 밤같이 까만 눈동자\n저 별은 나의 별 저 별은 너의 별\n잠 못 드는 이 밤에 가만히 불러본다"
+  },
+  {
+    "id": "ko-nonfiction-cheongchun-yebchan",
+    "language": "ko",
+    "genre": "nonfiction",
+    "title": "청춘예찬",
+    "author": "민태원",
+    "difficulty": "easy",
+    "text": "청춘! 이는 듣기만 하여도 가슴이 설레는 말이다. 청춘! 너의 두 손을 가슴에 대고, 물방아 같은 심장의 고동을 들어 보라. 청춘의 피는 끓는다. 끓는 피에 뜨거운 심장은 거선의 기관과 같이 힘있다."
+  },
+  {
+    "id": "ko-nonfiction-namuyi-cheolhak",
+    "language": "ko",
+    "genre": "nonfiction",
+    "title": "나무",
+    "author": "이양하",
+    "difficulty": "easy",
+    "text": "나무는 덕을 지녔다. 나무는 주어진 분수에 만족할 줄을 안다. 나무로 태어난 것을 탓하지 아니하고, 왜 여기 놓이고 저기 놓이지 않았는가를 말하지 아니한다. 등성이에 서면 햇살을 받는 위치라고 하고, 골짜기에 서면 또한 그늘진 곳이 좋다 한다."
+  },
+  {
+    "id": "ko-nonfiction-supdaeya",
+    "language": "ko",
+    "genre": "nonfiction",
+    "title": "들을 빼앗겨 봄조차 빼앗기겠네",
+    "author": "이상화",
+    "difficulty": "medium",
+    "text": "지금은 남의 땅, 빼앗긴 들에도 봄은 오는가. 나는 온몸에 햇살을 받고 푸른 하늘 푸른 들이 맞붙은 곳으로 가르마 같은 논길을 따라 꿈속을 가듯 걸어만 간다. 입술을 다문 하늘아 들아, 내 맘에는 내 혼자 온 것 같지를 않구나. 네가 끌었느냐 누가 부르더냐, 답답워라 말을 해 다오."
+  },
+  {
+    "id": "ko-nonfiction-bidan-girl",
+    "language": "ko",
+    "genre": "nonfiction",
+    "title": "은전 한 닢",
+    "author": "피천득",
+    "difficulty": "medium",
+    "text": "내가 상해에서 본 일이다. 늙은 거지 하나가 전장에 가서 큰 은전 한 닢을 내놓으면서, 호젓이 그러나 힘 있게 물었다. \"이것이 못쓰는 것이 아닙니까?\" 전장 주인은 거지를 물끄러미 내려다보다가, 돈을 두들겨 보고 또 들어서 칼끝으로 긁어 보더니 좋은 것이라고 내어 준다. 그는 무수히 머리를 조아리며 그 은전을 받아서는 가슴 깊이 집어넣고 절을 몇 번이나 하면서 간다."
+  },
+  {
+    "id": "ko-nonfiction-inyeon-pcd",
+    "language": "ko",
+    "genre": "nonfiction",
+    "title": "인연",
+    "author": "피천득",
+    "difficulty": "hard",
+    "text": "그리워하는데도 한 번 만나고는 못 만나게 되기도 하고, 일생을 못 잊으면서도 아니 만나고 사는 사람이 있다. 아사코와 나는 세 번 만났다. 세 번째는 아니 만났어야 좋았을 것이다. 어리석은 사람은 인연을 만나도 몰라보고, 보통 사람은 인연인 줄 알면서도 놓치고, 현명한 사람은 옷깃만 스쳐도 인연을 살려 낸다고 한다. 그러나 어쩌면 세 번째는 아니 만나는 것이 좋았을지도 모른다. 만남은 늘 헤어짐을 데리고 오는 것이기에, 그리움이라는 것은 차라리 만나지 않은 채로 마음속에 고이 간직하는 편이 더 아름다울 때가 있는 까닭이다."
+  },
+  {
+    "id": "ko-nonfiction-mumyeong-jeo",
+    "language": "ko",
+    "genre": "nonfiction",
+    "title": "무소유",
+    "author": "법정",
+    "difficulty": "hard",
+    "text": "우리는 필요에 의해서 물건을 갖지만, 그 물건 때문에 적잖이 마음을 쓰게 된다. 그러므로 무엇인가를 갖는다는 것은 다른 한편 무엇인가에 얽매인다는 뜻이다. 필요에 따라 가졌던 것이 도리어 우리를 부자유하게 얽어맨다고 할 때, 그것은 주객이 전도되어 우리가 그 물건의 노예가 되고 마는 셈이다. 그러니까 많이 가지고 있다는 것은 그만큼 많이 얽혀 있다는 뜻이다. 크게 버리는 사람만이 크게 얻을 수 있다는 말이 있다. 아무것도 갖지 않을 때 비로소 온 세상을 갖게 된다는 것은 무소유의 역리이다."
+  },
+  {
+    "id": "ko-nonfiction-gil-eul-tteonamyeo",
+    "language": "ko",
+    "genre": "nonfiction",
+    "title": "특급품",
+    "author": "김소운",
+    "difficulty": "medium",
+    "text": "일본 비자 반의 일종으로 비취라는 것이 있다. 반면이 일정한 정도로 갈라지면 거기에 진물이 새어들어 가느다란 균열이 메워지고, 그렇게 메워진 자국이 오히려 한층 더 아름다운 무늬가 된다. 갈라진 비자 반은 더 이상 흠집이 아니라 특급품으로 평가받게 되는 것이다. 과실이 생겨도 그것을 미봉할 줄 아는 사람만이 비로소 인생의 특급품이 될 수 있다."
+  },
+  {
+    "id": "ko-nonfiction-gwon-tae-eung",
+    "language": "ko",
+    "genre": "nonfiction",
+    "title": "면학의 서",
+    "author": "양주동",
+    "difficulty": "hard",
+    "text": "젊은 시절은 두 번 다시 오지 아니한다. 하루에 새벽은 한 번뿐, 좋은 시절에 부지런히 힘쓸 것이니, 세월은 사람을 기다려 주지 아니한다. 배움이란 마치 물을 거슬러 올라가는 배와 같아서, 앞으로 나아가지 않으면 곧 뒤로 밀려나고 만다. 그러므로 잠시도 노를 놓아서는 아니 된다. 오늘 배우지 아니하고 내일이 있다고 말하지 말며, 올해 배우지 아니하고 내년이 있다고 말하지 말라. 세월은 흘러가고 나를 위하여 더디 가지 아니하니, 아아, 늙었구나 하고 탄식한들 이것이 누구의 허물이겠는가."
+  },
+  {
+    "id": "en-poem-the-road-not-taken",
+    "language": "en",
+    "genre": "poem",
+    "title": "The Road Not Taken",
+    "author": "Robert Frost",
+    "difficulty": "hard",
+    "text": "Two roads diverged in a yellow wood,\nAnd sorry I could not travel both\nAnd be one traveler, long I stood\nAnd looked down one as far as I could\nTo where it bent in the undergrowth;\n\nThen took the other, as just as fair,\nAnd having perhaps the better claim,\nBecause it was grassy and wanted wear;\nThough as for that the passing there\nHad worn them really about the same."
+  },
+  {
+    "id": "en-poem-the-road-not-taken-end",
+    "language": "en",
+    "genre": "poem",
+    "title": "The Road Not Taken (closing stanza)",
+    "author": "Robert Frost",
+    "difficulty": "medium",
+    "text": "I shall be telling this with a sigh\nSomewhere ages and ages hence:\nTwo roads diverged in a wood, and I,\nI took the one less traveled by,\nAnd that has made all the difference."
+  },
+  {
+    "id": "en-poem-stopping-by-woods",
+    "language": "en",
+    "genre": "poem",
+    "title": "Stopping by Woods on a Snowy Evening",
+    "author": "Robert Frost",
+    "difficulty": "hard",
+    "text": "Whose woods these are I think I know.\nHis house is in the village though;\nHe will not see me stopping here\nTo watch his woods fill up with snow.\n\nMy little horse must think it queer\nTo stop without a farmhouse near\nBetween the woods and frozen lake\nThe darkest evening of the year."
+  },
+  {
+    "id": "en-poem-stopping-by-woods-end",
+    "language": "en",
+    "genre": "poem",
+    "title": "Stopping by Woods on a Snowy Evening (final stanza)",
+    "author": "Robert Frost",
+    "difficulty": "medium",
+    "text": "The woods are lovely, dark and deep.\nBut I have promises to keep,\nAnd miles to go before I sleep,\nAnd miles to go before I sleep."
+  },
+  {
+    "id": "en-poem-because-i-could-not-stop-for-death",
+    "language": "en",
+    "genre": "poem",
+    "title": "Because I could not stop for Death",
+    "author": "Emily Dickinson",
+    "difficulty": "medium",
+    "text": "Because I could not stop for Death -\nHe kindly stopped for me -\nThe Carriage held but just Ourselves -\nAnd Immortality."
+  },
+  {
+    "id": "en-poem-hope-is-the-thing-with-feathers",
+    "language": "en",
+    "genre": "poem",
+    "title": "Hope is the thing with feathers",
+    "author": "Emily Dickinson",
+    "difficulty": "medium",
+    "text": "Hope is the thing with feathers -\nThat perches in the soul -\nAnd sings the tune without the words -\nAnd never stops - at all -"
+  },
+  {
+    "id": "en-poem-sonnet-18",
+    "language": "en",
+    "genre": "poem",
+    "title": "Sonnet 18",
+    "author": "William Shakespeare",
+    "difficulty": "hard",
+    "text": "Shall I compare thee to a summer's day?\nThou art more lovely and more temperate:\nRough winds do shake the darling buds of May,\nAnd summer's lease hath all too short a date;\nSometime too hot the eye of heaven shines,\nAnd often is his gold complexion dimm'd;\nAnd every fair from fair sometime declines,\nBy chance or nature's changing course untrimm'd."
+  },
+  {
+    "id": "en-poem-i-wandered-lonely-as-a-cloud",
+    "language": "en",
+    "genre": "poem",
+    "title": "I Wandered Lonely as a Cloud",
+    "author": "William Wordsworth",
+    "difficulty": "easy",
+    "text": "I wandered lonely as a cloud\nThat floats on high o'er vales and hills,\nWhen all at once I saw a crowd,\nA host, of golden daffodils."
+  },
+  {
+    "id": "en-novel-call-me-ishmael",
+    "language": "en",
+    "genre": "novel",
+    "title": "Moby-Dick",
+    "author": "Herman Melville",
+    "difficulty": "easy",
+    "text": "Call me Ishmael. Some years ago, never mind how long precisely, I thought I would sail about a little and see the watery part of the world."
+  },
+  {
+    "id": "en-novel-1984-clocks-thirteen",
+    "language": "en",
+    "genre": "novel",
+    "title": "1984",
+    "author": "George Orwell",
+    "difficulty": "easy",
+    "text": "It was a bright cold day in April, and the clocks were striking thirteen."
+  },
+  {
+    "id": "en-novel-pride-truth-universally",
+    "language": "en",
+    "genre": "novel",
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "difficulty": "medium",
+    "text": "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife."
+  },
+  {
+    "id": "en-novel-gatsby-fathers-advice",
+    "language": "en",
+    "genre": "novel",
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "difficulty": "medium",
+    "text": "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since. Whenever you feel like criticizing any one, he told me, just remember that all the people in this world haven't had the advantages that you've had."
+  },
+  {
+    "id": "en-novel-hobbit-hole-in-the-ground",
+    "language": "en",
+    "genre": "novel",
+    "title": "The Hobbit",
+    "author": "J. R. R. Tolkien",
+    "difficulty": "medium",
+    "text": "In a hole in the ground there lived a hobbit. Not a nasty, dirty, wet hole, filled with the ends of worms and an oozy smell, nor yet a dry, bare, sandy hole with nothing in it to sit down on or to eat: it was a hobbit-hole, and that means comfort."
+  },
+  {
+    "id": "en-novel-tale-two-cities-best-of-times",
+    "language": "en",
+    "genre": "novel",
+    "title": "A Tale of Two Cities",
+    "author": "Charles Dickens",
+    "difficulty": "hard",
+    "text": "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair, we had everything before us, we had nothing before us."
+  },
+  {
+    "id": "en-novel-gatsby-green-light",
+    "language": "en",
+    "genre": "novel",
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "difficulty": "hard",
+    "text": "Gatsby believed in the green light, the orgastic future that year by year recedes before us. It eluded us then, but that's no matter, tomorrow we will run faster, stretch out our arms farther. And one fine morning, so we beat on, boats against the current, borne back ceaselessly into the past."
+  },
+  {
+    "id": "en-novel-fellowship-one-ring",
+    "language": "en",
+    "genre": "novel",
+    "title": "The Lord of the Rings",
+    "author": "J. R. R. Tolkien",
+    "difficulty": "hard",
+    "text": "Three Rings for the Elven-kings under the sky, Seven for the Dwarf-lords in their halls of stone, Nine for Mortal Men doomed to die, One for the Dark Lord on his dark throne, in the Land of Mordor where the Shadows lie. One Ring to rule them all, One Ring to find them, One Ring to bring them all, and in the darkness bind them, in the Land of Mordor where the Shadows lie."
+  },
+  {
+    "id": "en-song-amazing-grace",
+    "language": "en",
+    "genre": "song",
+    "title": "Amazing Grace",
+    "author": "John Newton",
+    "difficulty": "medium",
+    "text": "Amazing grace! How sweet the sound\nThat saved a wretch like me!\nI once was lost, but now am found,\nWas blind, but now I see."
+  },
+  {
+    "id": "en-song-this-land",
+    "language": "en",
+    "genre": "song",
+    "title": "This Land Is Your Land",
+    "author": "Woody Guthrie",
+    "difficulty": "medium",
+    "text": "This land is your land, this land is my land\nFrom California to the New York Island,\nFrom the redwood forest to the Gulf Stream waters,\nThis land was made for you and me."
+  },
+  {
+    "id": "en-song-oh-susanna",
+    "language": "en",
+    "genre": "song",
+    "title": "Oh! Susanna",
+    "author": "Stephen Foster",
+    "difficulty": "medium",
+    "text": "Oh, Susanna, oh don't you cry for me,\nFor I come from Alabama with my banjo on my knee.\nI come from Alabama with my banjo on my knee,\nI'm going to Louisiana, my true love for to see."
+  },
+  {
+    "id": "en-song-home-on-range",
+    "language": "en",
+    "genre": "song",
+    "title": "Home on the Range",
+    "author": "Traditional",
+    "difficulty": "hard",
+    "text": "Oh, give me a home where the buffalo roam,\nWhere the deer and the antelope play,\nWhere seldom is heard a discouraging word,\nAnd the skies are not cloudy all day.\nHome, home on the range,\nWhere the deer and the antelope play,\nWhere seldom is heard a discouraging word,\nAnd the skies are not cloudy all day."
+  },
+  {
+    "id": "en-song-clementine",
+    "language": "en",
+    "genre": "song",
+    "title": "Oh My Darling, Clementine",
+    "author": "Traditional",
+    "difficulty": "hard",
+    "text": "In a cavern, in a canyon, excavating for a mine,\nDwelt a miner, forty-niner, and his daughter Clementine.\nOh my darling, oh my darling, oh my darling Clementine,\nYou are lost and gone forever, dreadful sorry, Clementine.\nLight she was and like a fairy, and her shoes were number nine,\nHerring boxes without topses, sandals were for Clementine."
+  },
+  {
+    "id": "en-song-swing-low",
+    "language": "en",
+    "genre": "song",
+    "title": "Swing Low, Sweet Chariot",
+    "author": "Traditional",
+    "difficulty": "easy",
+    "text": "Swing low, sweet chariot,\nComing for to carry me home,\nSwing low, sweet chariot,\nComing for to carry me home."
+  },
+  {
+    "id": "en-song-shenandoah",
+    "language": "en",
+    "genre": "song",
+    "title": "Shenandoah",
+    "author": "Traditional",
+    "difficulty": "medium",
+    "text": "Oh Shenandoah, I long to hear you,\nAway, you rolling river,\nOh Shenandoah, I long to hear you,\nAway, I'm bound away, across the wide Missouri."
+  },
+  {
+    "id": "en-song-when-saints",
+    "language": "en",
+    "genre": "song",
+    "title": "When the Saints Go Marching In",
+    "author": "Traditional",
+    "difficulty": "easy",
+    "text": "Oh, when the saints go marching in,\nOh, when the saints go marching in,\nLord, how I want to be in that number\nWhen the saints go marching in."
+  }
+]
