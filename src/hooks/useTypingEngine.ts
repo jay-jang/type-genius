@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type * as React from 'react'
 import type { CharStatus, Language, LiveStats, WpmSample } from '../types'
-import { strokesForChar } from '../lib/hangul'
+import { strokesForChar, isHangulChar, decomposeToStrokes, isCompositionCorrect } from '../lib/hangul'
 import { accuracyPct, consistencyFromSamples, grossWpm } from '../lib/metrics'
 
 export interface EngineResult {
   wpm: number
   rawWpm: number
   cpm: number
+  rawCpm: number
   accuracy: number
   consistency: number
   durationMs: number
@@ -33,7 +34,7 @@ interface EngineOptions extends EngineEvents {
 }
 
 const EMPTY_STATS: LiveStats = {
-  wpm: 0, rawWpm: 0, cpm: 0, accuracy: 100, errors: 0,
+  wpm: 0, rawWpm: 0, cpm: 0, rawCpm: 0, accuracy: 100, errors: 0,
   progress: 0, combo: 0, maxCombo: 0, elapsedMs: 0,
 }
 
@@ -61,6 +62,8 @@ export function useTypingEngine(opts: EngineOptions) {
   const valueRef = useRef('')
   const composingRef = useRef(false)
   const finishedRef = useRef(false)
+  const lastComposingStrokesRef = useRef<string[]>([])
+  const rawStrokesRef = useRef(0)
 
   // Render state.
   const [value, setValue] = useState('')
@@ -86,10 +89,14 @@ export function useTypingEngine(opts: EngineOptions) {
     }
     const mins = elapsed / MINUTE
     const cpm = mins > 0 ? correctStrokes / mins : 0
+    const rawStrokes = language === 'ko' ? rawStrokesRef.current : enteredRef.current
+    const rawCpmVal = mins > 0 ? rawStrokes / mins : 0
+
     const live: LiveStats = {
       wpm: Math.round(grossWpm(correctCount, elapsed)),
       rawWpm: Math.round(grossWpm(enteredRef.current, elapsed)),
       cpm: Math.round(cpm),
+      rawCpm: Math.round(rawCpmVal),
       accuracy: Math.round(accuracyPct(enteredRef.current, errorsRef.current) * 10) / 10,
       errors: errorsRef.current,
       progress: target.length ? Math.min(1, committedRef.current / target.length) : 0,
@@ -122,18 +129,24 @@ export function useTypingEngine(opts: EngineOptions) {
       ? [...target].reduce((a, c) => a + (c === '\n' || c === '\r' ? 0 : strokesForChar(c)), 0)
       : charCount
 
-    // ensure a final sample exists
+    const rawStrokes = language === 'ko' ? rawStrokesRef.current : enteredRef.current
     const liveRaw = Math.round(grossWpm(enteredRef.current, durationMs))
+    const liveRawCpm = Math.round(rawStrokes / mins)
+
+    // ensure a final sample exists
     samplesRef.current.push({
       t: Math.round(durationMs / 1000),
       wpm: Math.round(grossWpm(correctCount, durationMs)),
       raw: liveRaw,
+      cpm: Math.round(correctStrokes / mins),
+      rawCpm: liveRawCpm,
     })
 
     const result: EngineResult = {
       wpm: Math.round(grossWpm(correctCount, durationMs)),
       rawWpm: liveRaw,
       cpm: Math.round(correctStrokes / mins),
+      rawCpm: liveRawCpm,
       accuracy: Math.round(accuracyPct(enteredRef.current, errorsRef.current) * 10) / 10,
       consistency: consistencyFromSamples(samplesRef.current),
       durationMs,
@@ -159,22 +172,38 @@ export function useTypingEngine(opts: EngineOptions) {
     while (committedRef.current < v.length) {
       const p = committedRef.current
       enteredRef.current++
+
+      // Count raw strokes: for English count all character inputs, for Korean count spaces/punctuations here
+      if (language !== 'ko') {
+        rawStrokesRef.current++
+      } else if (!isHangulChar(target[p])) {
+        rawStrokesRef.current++
+      }
+
       const correct = v[p] === target[p]
       if (correct) {
         comboRef.current++
         if (comboRef.current > maxComboRef.current) maxComboRef.current = comboRef.current
         if (comboRef.current > 0 && comboRef.current % 10 === 0) cb.current.onCombo?.(comboRef.current / 10)
-        cb.current.onCorrect?.()
+        
+        // In Korean, Jamos play sounds during composition, not here on commit.
+        // We only trigger correct sound for non-Hangul characters (e.g. spaces, punctuation) on commit.
+        if (language !== 'ko' || !isHangulChar(target[p])) {
+          cb.current.onCorrect?.()
+        }
       } else {
-        errorsRef.current++
-        errorPosRef.current.add(p)
-        comboRef.current = 0
-        cb.current.onMistake?.()
+        const alreadyErrored = errorPosRef.current.has(p)
+        if (!alreadyErrored) {
+          errorsRef.current++
+          errorPosRef.current.add(p)
+          comboRef.current = 0
+          cb.current.onMistake?.()
+        }
       }
       committedRef.current++
     }
     setCombo(comboRef.current)
-  }, [target])
+  }, [target, language])
 
   const handleValue = useCallback(
     (v: string, composing: boolean) => {
@@ -183,6 +212,38 @@ export function useTypingEngine(opts: EngineOptions) {
       setValue(v)
       composingRef.current = composing
       if (composing !== isComposing) setIsComposing(composing)
+
+      // Jamo-level prefix validation and real-time audio-visual feedback during Hangul composition
+      if (language === 'ko' && composing) {
+        const p = committedRef.current
+        if (v.length > p && target.length > p) {
+          const compChar = v[p]
+          const compStrokes = decomposeToStrokes(compChar)
+          const targetStrokes = decomposeToStrokes(target[p])
+
+          // If the Jamo count has increased, the user typed a new key
+          if (compStrokes.length > lastComposingStrokesRef.current.length) {
+            rawStrokesRef.current++
+            const isCorrect = compStrokes.every((stroke, idx) => stroke === targetStrokes[idx])
+            if (isCorrect) {
+              cb.current.onCorrect?.()
+            } else {
+              cb.current.onMistake?.()
+              comboRef.current = 0
+              setCombo(0)
+              const alreadyErrored = errorPosRef.current.has(p)
+              if (!alreadyErrored) {
+                errorsRef.current++
+                errorPosRef.current.add(p)
+              }
+            }
+          }
+          lastComposingStrokesRef.current = compStrokes
+        }
+      } else {
+        lastComposingStrokesRef.current = []
+      }
+
       if (!composing) evaluate(v)
       setCommitted(committedRef.current)
       setStats(computeLive())
@@ -196,7 +257,7 @@ export function useTypingEngine(opts: EngineOptions) {
         finalize()
       }
     },
-    [enabled, target, isComposing, evaluate, computeLive, finalize],
+    [enabled, target, isComposing, language, evaluate, computeLive, finalize],
   )
 
   const reset = useCallback(() => {
@@ -212,6 +273,8 @@ export function useTypingEngine(opts: EngineOptions) {
     valueRef.current = ''
     composingRef.current = false
     finishedRef.current = false
+    lastComposingStrokesRef.current = []
+    rawStrokesRef.current = 0
     setValue('')
     setCommitted(0)
     setIsComposing(false)
@@ -237,7 +300,13 @@ export function useTypingEngine(opts: EngineOptions) {
       const sec = Math.floor(live.elapsedMs / 1000)
       if (sec >= 1 && sec > lastSampleSecRef.current) {
         lastSampleSecRef.current = sec
-        samplesRef.current.push({ t: sec, wpm: live.wpm, raw: live.rawWpm })
+        samplesRef.current.push({
+          t: sec,
+          wpm: live.wpm,
+          raw: live.rawWpm,
+          cpm: live.cpm,
+          rawCpm: live.rawCpm,
+        })
       }
     }, 200)
     return () => window.clearInterval(id)
@@ -277,7 +346,13 @@ export function statusesFor(target: string, value: string, committed: number, co
   const out: CharStatus[] = new Array(target.length)
   for (let i = 0; i < target.length; i++) {
     if (i < committed) out[i] = value[i] === target[i] ? 'correct' : 'incorrect'
-    else if (composing && i < value.length) out[i] = 'composing'
+    else if (composing && i < value.length) {
+      if (i === committed) {
+        out[i] = isCompositionCorrect(target[i], value[i]) ? 'composing' : 'composing-incorrect'
+      } else {
+        out[i] = 'composing'
+      }
+    }
     else out[i] = 'untyped'
   }
   return out

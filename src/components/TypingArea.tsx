@@ -99,7 +99,7 @@ export function TypingArea({ target, language, title, subtitle, badge, onFinish 
       const letters: ReactElement[] = []
       while (i < target.length && target[i] !== ' ' && target[i] !== '\n') {
         const st = statuses[i]
-        const display = st === 'composing' ? value[i] ?? target[i] : target[i]
+        const display = (st === 'composing' || st === 'composing-incorrect') ? value[i] ?? target[i] : target[i]
         letters.push(
           <span key={i} data-i={String(i)} className={`letter ${st}`}>
             {display}

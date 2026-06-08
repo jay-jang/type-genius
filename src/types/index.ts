@@ -41,6 +41,8 @@ export interface SessionResult {
   cpm: number
   /** WPM counting every keystroke including errors. */
   rawWpm: number
+  /** CPM counting every keystroke including errors. */
+  rawCpm?: number
   accuracy: number // 0..100
   consistency: number // 0..100
   durationMs: number
@@ -70,6 +72,7 @@ export interface LiveStats {
   wpm: number
   rawWpm: number
   cpm: number
+  rawCpm: number
   accuracy: number
   errors: number
   progress: number // 0..1
@@ -82,7 +85,10 @@ export interface WpmSample {
   t: number // seconds since start
   wpm: number
   raw: number
+  cpm?: number
+  rawCpm?: number
 }
 
 /** Per-target-character render status used by the typing surface. */
-export type CharStatus = 'untyped' | 'correct' | 'incorrect' | 'composing'
+export type CharStatus = 'untyped' | 'correct' | 'incorrect' | 'composing' | 'composing-incorrect'
+

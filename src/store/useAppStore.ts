@@ -97,7 +97,10 @@ export const useAppStore = create<AppState>()(
         const profileId = get().currentProfileId
         if (!profileId) return null
         const session: SessionResult = { ...r, id: uid(), profileId, timestamp: Date.now() }
-        set((s) => ({ sessions: [...s.sessions, session] }))
+        set((s) => {
+          const raw = [...s.sessions, session]
+          return { sessions: raw.slice(-1000) }
+        })
         return session
       },
 

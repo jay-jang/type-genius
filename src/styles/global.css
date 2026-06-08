@@ -1661,3 +1661,146 @@ kbd {
     opacity: 1;
   }
 }
+
+/* Glassmorphism & Cyber-Luxury visual theme enhancements */
+.glass-panel {
+  background: rgba(44, 46, 49, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--round);
+}
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  animation: fadeUp 0.3s ease;
+}
+
+.library-grid-card {
+  background: rgba(44, 46, 49, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--round);
+  padding: 1.4rem;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.25s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.library-grid-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--main);
+  box-shadow: 0 8px 30px rgba(124, 92, 255, 0.12), 0 0 0 1px var(--main);
+}
+
+.library-grid-card .dc-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.library-grid-card .dc-genre {
+  color: var(--sub);
+}
+
+.library-grid-card .dc-diff {
+  font-weight: 700;
+}
+
+.library-grid-card .dc-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 0.2rem;
+}
+
+.library-grid-card .dc-author {
+  font-size: 0.85rem;
+  color: var(--sub);
+}
+
+.library-grid-card .dc-preview {
+  font-size: 0.9rem;
+  color: var(--sub);
+  margin: 0.5rem 0;
+  line-height: 1.4;
+  height: 3.8em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.library-grid-card .dc-meta {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--sub);
+  margin-top: auto;
+}
+
+.letter.composing-incorrect {
+  color: var(--error) !important;
+  border-bottom: 2px solid var(--error) !important;
+}
+
+/* Subtle glowing pulse animations for active elements */
+@keyframes neonPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(124, 92, 255, 0.15); }
+  50% { box-shadow: 0 0 16px rgba(124, 92, 255, 0.35); }
+}
+
+/* Let's elevate default components to Cyber-Glass style */
+.config-bar {
+  background: rgba(44, 46, 49, 0.55) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+.deck-card {
+  background: rgba(44, 46, 49, 0.5) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.space-card {
+  background: rgba(44, 46, 49, 0.4) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.25s ease !important;
+}
+
+.space-card.on {
+  border-color: var(--main) !important;
+  box-shadow: 0 0 15px rgba(226, 183, 20, 0.2);
+}
+
+.btn {
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Enhancing theme data colors */
+[data-theme='serika-dark'] {
+  --main-rgb: 226, 183, 20;
+}
+[data-theme='aurora'] {
+  --main-rgb: 124, 92, 255;
+  --bg: #090a0f;
+  background-image: radial-gradient(circle at 50% 50%, #15142a 0%, #090a0f 100%) !important;
+}
+[data-theme='dracula'] {
+  --main-rgb: 189, 147, 249;
+}
+

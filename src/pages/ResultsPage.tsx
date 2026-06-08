@@ -39,8 +39,8 @@ export function ResultsPage() {
   const drillText = buildDrill(meta.text, result.errorPositions)
   const perfect = result.errorPositions.length === 0
 
-  const wpmSeries = result.samples.map((s) => s.wpm)
-  const rawSeries = result.samples.map((s) => s.raw)
+  const scoreSeries = meta.mode === 'ko' ? result.samples.map((s) => s.cpm ?? s.wpm) : result.samples.map((s) => s.wpm)
+  const rawSeries = meta.mode === 'ko' ? result.samples.map((s) => s.rawCpm ?? s.raw) : result.samples.map((s) => s.raw)
 
   const typeLabel =
     meta.genre === 'drill' ? `${MODE_LABELS[meta.mode]} · 오답` : `${MODE_LABELS[meta.mode]} · ${GENRE_LABELS[meta.genre]}`
@@ -68,11 +68,11 @@ export function ResultsPage() {
         <div className="res-graph">
           <LineChart
             series={[
-              { values: wpmSeries, color: 'var(--main)' },
+              { values: scoreSeries, color: 'var(--main)' },
               { values: rawSeries, color: 'var(--sub)' },
             ]}
             height={180}
-            unit="wpm"
+            unit={unit}
             xLabel="시간(초)"
           />
         </div>

@@ -20,6 +20,7 @@ export function LibraryPage() {
   const [q, setQ] = useState('')
   const [idx, setIdx] = useState(0)
   const [dir, setDir] = useState(1)
+  const [viewMode, setViewMode] = useState<'card' | 'grid'>('card')
   const touchX = useRef<number | null>(null)
 
   const language = space === 'mixed' ? undefined : space
@@ -68,15 +69,17 @@ export function LibraryPage() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.tagName === 'INPUT') return
-      if (e.key === 'ArrowLeft') go(-1)
-      else if (e.key === 'ArrowRight') go(1)
-      else if (e.key === 'Enter') {
-        if (cur) startPassage(cur.id, space)
-      } else if (e.key.toLowerCase() === 's') shuffle()
+      if (viewMode === 'card') {
+        if (e.key === 'ArrowLeft') go(-1)
+        else if (e.key === 'ArrowRight') go(1)
+        else if (e.key === 'Enter') {
+          if (cur) startPassage(cur.id, space)
+        } else if (e.key.toLowerCase() === 's') shuffle()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  })
+  }, [viewMode, cur, n, idx, space, startPassage])
 
   return (
     <div className="screen library">
@@ -90,6 +93,9 @@ export function LibraryPage() {
           </h1>
         </div>
         <div className="page-head-actions">
+          <button className="btn" onClick={() => setViewMode(v => v === 'card' ? 'grid' : 'card')}>
+            {viewMode === 'card' ? '그리드 보기 ⊞' : '카드 보기 🗂'}
+          </button>
           <button className="btn" onClick={shuffle} disabled={n <= 1} title="무작위 글 (S)">
             셔플 ↻
           </button>
@@ -134,6 +140,36 @@ export function LibraryPage() {
 
       {!cur ? (
         <p className="empty-msg">조건에 맞는 글이 없어요.</p>
+      ) : viewMode === 'grid' ? (
+        <div className="library-grid">
+          {list.map((item) => (
+            <article
+              key={item.id}
+              className={`library-grid-card ${cur?.id === item.id ? 'active' : ''}`}
+              onClick={() => startPassage(item.id, space)}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="dc-top">
+                <span className="dc-genre">{GENRE_LABELS[item.genre]}</span>
+                <span className={`dc-diff diff-${item.difficulty}`}>{DIFFICULTY_LABELS[item.difficulty]}</span>
+              </div>
+              <div className="dc-title">{item.title}</div>
+              <div className="dc-author">
+                {item.author}
+                {space === 'mixed' && <span className="pc-lang"> · {LANGUAGE_LABELS[item.language]}</span>}
+              </div>
+              <p className="dc-preview">
+                {item.text.trim().slice(0, 120)}
+                {item.text.trim().length > 120 ? '…' : ''}
+              </p>
+              <div className="dc-meta">
+                <span>{item.text.replace(/[\n\r]/g, '').length}자</span>
+                <span>·</span>
+                <span>{item.language === 'ko' ? countStrokes(item.text) : item.text.replace(/[\n\r]/g, '').length}타</span>
+              </div>
+            </article>
+          ))}
+        </div>
       ) : (
         <>
           <div className="deck">

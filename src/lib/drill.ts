@@ -27,7 +27,11 @@ export function buildDrill(text: string, errorPositions: number[], repeats = 3):
   const errs = new Set(errorPositions)
   const wrongWords: string[] = []
   const seen = new Set<string>()
-  for (const tok of tokenize(text)) {
+  const tokens = tokenize(text)
+  
+  // To handle space typos, we also check if the space *following* a word has an error
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i]
     let hit = false
     for (let p = tok.start; p < tok.end; p++) {
       if (errs.has(p)) {
@@ -35,6 +39,17 @@ export function buildDrill(text: string, errorPositions: number[], repeats = 3):
         break
       }
     }
+    
+    // Find if the space immediately following this word had an error
+    const nextStart = tok.end
+    const nextEnd = tokens[i + 1] ? tokens[i + 1].start : text.length
+    for (let p = nextStart; p < nextEnd; p++) {
+      if (errs.has(p)) {
+        hit = true
+        break
+      }
+    }
+
     if (hit && !seen.has(tok.text)) {
       seen.add(tok.text)
       wrongWords.push(tok.text)
@@ -53,12 +68,29 @@ export function countDrillWords(text: string, errorPositions: number[]): number 
   if (!errorPositions.length) return 0
   const errs = new Set(errorPositions)
   const seen = new Set<string>()
-  for (const tok of tokenize(text)) {
+  const tokens = tokenize(text)
+  
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i]
+    let hit = false
     for (let p = tok.start; p < tok.end; p++) {
       if (errs.has(p)) {
-        seen.add(tok.text)
+        hit = true
         break
       }
+    }
+    
+    const nextStart = tok.end
+    const nextEnd = tokens[i + 1] ? tokens[i + 1].start : text.length
+    for (let p = nextStart; p < nextEnd; p++) {
+      if (errs.has(p)) {
+        hit = true
+        break
+      }
+    }
+
+    if (hit) {
+      seen.add(tok.text)
     }
   }
   return seen.size

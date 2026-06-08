@@ -25,6 +25,7 @@ class SoundEngine {
   private enabled = true
   private volume = 0.6
   private profile: KeySoundProfile = 'thock'
+  private noiseBuffer: AudioBuffer | null = null
 
   private ensure(): boolean {
     if (this.ctx) return true
@@ -35,6 +36,16 @@ class SoundEngine {
     this.master = this.ctx.createGain()
     this.master.gain.value = this.volume
     this.master.connect(this.ctx.destination)
+
+    // Pre-allocate 1 second of white noise
+    const sampleRate = this.ctx.sampleRate
+    const bufferSize = sampleRate * 1.0
+    this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, sampleRate)
+    const data = this.noiseBuffer.getChannelData(0)
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1
+    }
+
     return true
   }
 
@@ -77,25 +88,27 @@ class SoundEngine {
   }
 
   private clickNoise(amount: number, dur: number): void {
-    if (amount <= 0) return
+    if (amount <= 0 || !this.noiseBuffer) return
     const start = this.t
-    const frames = Math.floor(this.ctx!.sampleRate * dur)
-    const buf = this.ctx!.createBuffer(1, frames, this.ctx!.sampleRate)
-    const data = buf.getChannelData(0)
-    for (let i = 0; i < frames; i++) {
-      data[i] = (Math.random() * 2 - 1) * (1 - i / frames) // decaying noise burst
-    }
     const src = this.ctx!.createBufferSource()
-    src.buffer = buf
+    src.buffer = this.noiseBuffer
+
+    // Play a random slice of the pre-allocated noise buffer
+    const bufferDuration = this.noiseBuffer.duration
+    const playOffset = Math.random() * (bufferDuration - dur - 0.05)
+
     const filt = this.ctx!.createBiquadFilter()
     filt.type = 'highpass'
     filt.frequency.value = 1800
+
     const g = this.ctx!.createGain()
-    g.gain.value = amount
+    g.gain.setValueAtTime(amount, start)
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur)
+
     src.connect(filt)
     filt.connect(g)
     g.connect(this.master!)
-    src.start(start)
+    src.start(start, playOffset, dur)
   }
 
   /** A correct keystroke. */

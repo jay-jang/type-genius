@@ -85,3 +85,49 @@ export function hangulRatio(text: string): number {
   }
   return total === 0 ? 0 : hangul / total
 }
+
+const INITIALS = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ']
+const MEDIALS = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ']
+const FINALS = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ']
+
+const COMP_MAP: Record<string, string[]> = {
+  'ㅘ': ['ㅗ', 'ㅏ'], 'ㅙ': ['ㅗ', 'ㅐ'], 'ㅚ': ['ㅗ', 'ㅣ'],
+  'ㅝ': ['ㅜ', 'ㅓ'], 'ㅞ': ['ㅜ', 'ㅔ'], 'ㅟ': ['ㅜ', 'ㅣ'], 'ㅢ': ['ㅡ', 'ㅣ'],
+  'ㄳ': ['ㄱ', 'ㅅ'], 'ㄵ': ['ㄴ', 'ㅈ'], 'ㄶ': ['ㄴ', 'ㅎ'],
+  'ㄺ': ['ㄹ', 'ㄱ'], 'ㄻ': ['ㄹ', 'ㅁ'], 'ㄼ': ['ㄹ', 'ㅂ'], 'ㄽ': ['ㄹ', 'ㅅ'],
+  'ㄾ': ['ㄹ', 'ㅌ'], 'ㄿ': ['ㄹ', 'ㅍ'], 'ㅀ': ['ㄹ', 'ㅎ'], 'ㅄ': ['ㅂ', 'ㅅ']
+}
+
+export function decomposeToStrokes(char: string): string[] {
+  const code = char.codePointAt(0)
+  if (!code) return []
+  
+  if (code >= HANGUL_BASE && code <= HANGUL_END) {
+    const s = code - HANGUL_BASE
+    const initial = INITIALS[Math.floor(s / 588)]
+    const medial = MEDIALS[Math.floor((s % 588) / 28)]
+    const final = FINALS[s % 28]
+    
+    return [
+      initial,
+      ...(COMP_MAP[medial] || [medial]),
+      ...(final ? (COMP_MAP[final] || [final]) : [])
+    ]
+  }
+  
+  if (code >= 0x3130 && code <= 0x318f) {
+    return COMP_MAP[char] || [char]
+  }
+  
+  return [char]
+}
+
+export function isCompositionCorrect(targetChar: string, composingChar: string): boolean {
+  if (!targetChar || !composingChar) return false
+  const targetStrokes = decomposeToStrokes(targetChar)
+  const compStrokes = decomposeToStrokes(composingChar)
+  
+  if (compStrokes.length > targetStrokes.length) return false
+  return compStrokes.every((stroke, idx) => stroke === targetStrokes[idx])
+}
+
