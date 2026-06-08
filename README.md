@@ -33,14 +33,14 @@ SPA 폴백·캐시 헤더·올바른 MIME 를 처리합니다.
 
 ```bash
 npm run build
-PORT=8080 HOST=0.0.0.0 node server.mjs   # 또는: npm start
+PORT=3001 HOST=0.0.0.0 node server.mjs   # 또는: npm start
 ```
 
 리버스 프록시(Nginx/Caddy)나 터널(cloudflared/ngrok) 뒤에 두면 외부에서 접속됩니다.
 빠른 공개 URL 예시:
 
 ```bash
-cloudflared tunnel --url http://localhost:8080   # https://<random>.trycloudflare.com
+cloudflared tunnel --url http://localhost:3001   # https://<random>.trycloudflare.com
 ```
 
 ### 2) systemd 로 상시 구동 (서버 + 터널 자동 재시작)
@@ -59,7 +59,7 @@ sudo journalctl -u typegenius-tunnel -o cat | grep -o 'https://[a-z0-9-]*\.trycl
 
 ```bash
 docker build -t typegenius .
-docker run -p 8080:8080 typegenius   # http://localhost:8080
+docker run -p 3001:3001 typegenius   # http://localhost:3001
 ```
 
 ### 4) 정적 호스트 (Netlify / Vercel / GitHub Pages)

@@ -2,7 +2,7 @@
 // Binds 0.0.0.0 so it can be reached remotely / behind a tunnel or proxy.
 //
 //   npm run build && node server.mjs
-//   PORT=8080 HOST=0.0.0.0 node server.mjs
+//   PORT=3001 HOST=0.0.0.0 node server.mjs
 //
 // Serves hashed assets with long-lived immutable caching, HTML/sw.js with
 // no-cache, and falls back to index.html for unknown non-asset routes (SPA).
@@ -13,7 +13,7 @@ import { join, extname, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), 'dist')
-const PORT = Number(process.env.PORT) || 8080
+const PORT = Number(process.env.PORT) || 3001
 const HOST = process.env.HOST || '0.0.0.0'
 
 const MIME = {
