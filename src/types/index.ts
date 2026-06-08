@@ -59,6 +59,8 @@ export interface Settings {
   keySoundProfile: KeySoundProfile
   fontSize: number // px
   showLiveStats: boolean
+  theme: string // theme id, see data/themes.ts
+  smoothCaret: boolean
 }
 
 export type KeySoundProfile = 'thock' | 'click' | 'soft'

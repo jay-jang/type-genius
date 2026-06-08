@@ -9,7 +9,7 @@
 
 import { createServer } from 'node:http'
 import { readFile, stat } from 'node:fs/promises'
-import { join, extname, normalize } from 'node:path'
+import { join, extname, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), 'dist')
@@ -34,10 +34,17 @@ const MIME = {
 }
 
 function resolvePath(urlPath) {
-  const decoded = decodeURIComponent((urlPath || '/').split('?')[0])
-  let p = normalize(decoded).replace(/^(\.\.[/\\])+/, '')
-  if (p === '/' || p === '') p = '/index.html'
-  return join(ROOT, p)
+  let decoded
+  try {
+    decoded = decodeURIComponent((urlPath || '/').split('?')[0])
+  } catch {
+    decoded = '/'
+  }
+  if (decoded === '/' || decoded === '') decoded = '/index.html'
+  // Resolve then verify the result stays inside ROOT (canonical traversal guard).
+  const full = resolve(ROOT, '.' + (decoded.startsWith('/') ? decoded : '/' + decoded))
+  if (full !== ROOT && !full.startsWith(ROOT + sep)) return join(ROOT, 'index.html')
+  return full
 }
 
 const server = createServer(async (req, res) => {
@@ -74,6 +81,11 @@ const server = createServer(async (req, res) => {
       'Content-Length': body.length,
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'no-referrer-when-downgrade',
+      'X-Frame-Options': 'DENY',
+      'Content-Security-Policy':
+        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+        "img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; " +
+        "worker-src 'self'; media-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
     }
     if (filePath.includes(`${'assets'}/`)) headers['Cache-Control'] = 'public, max-age=31536000, immutable'
     else if (ext === '.html' || filePath.endsWith('sw.js')) headers['Cache-Control'] = 'no-cache'

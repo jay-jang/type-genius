@@ -4,9 +4,11 @@ import { LineChart } from '../components/LineChart'
 import { buildDrill, countDrillWords } from '../lib/drill'
 import { scoreUnit, MODE_LABELS } from '../lib/stats'
 import { formatDuration } from '../lib/metrics'
+import { GENRE_LABELS } from '../data'
+import { IconRedo, IconForward, IconTarget } from '../components/Icons'
 
 export function ResultsPage() {
-  const { lastResult, retry, next, startDrill, openLibrary, goRankings, goHome } = useNav()
+  const { lastResult, retry, next, startDrill, goHome } = useNav()
   const sessions = useAppStore((s) => s.sessions)
   const currentId = useAppStore((s) => s.currentProfileId)
 
@@ -15,7 +17,7 @@ export function ResultsPage() {
       <div className="screen center-screen">
         <p className="empty-msg">표시할 결과가 없어요.</p>
         <button className="btn primary" onClick={goHome}>
-          홈으로
+          테스트 시작
         </button>
       </div>
     )
@@ -25,7 +27,6 @@ export function ResultsPage() {
   const score = meta.mode === 'ko' ? result.cpm : result.wpm
   const unit = scoreUnit(meta.mode)
 
-  // Record detection (non-drill only).
   const peers = sessions
     .filter((s) => s.profileId === currentId && s.mode === meta.mode && !s.isDrill)
     .sort((a, b) => a.timestamp - b.timestamp)
@@ -41,103 +42,90 @@ export function ResultsPage() {
   const wpmSeries = result.samples.map((s) => s.wpm)
   const rawSeries = result.samples.map((s) => s.raw)
 
+  const typeLabel =
+    meta.genre === 'drill' ? `${MODE_LABELS[meta.mode]} · 오답` : `${MODE_LABELS[meta.mode]} · ${GENRE_LABELS[meta.genre]}`
+
   return (
     <div className="screen results">
-      <div className="results-hero">
+      <div className="res-badges">
         {meta.isDrill && <span className="result-badge drill">오답 연습 완료</span>}
-        {isRecord && <span className="result-badge record">🏆 최고 기록 갱신!</span>}
-        {isFirst && <span className="result-badge first">✨ 첫 기록 등록!</span>}
-        {perfect && !meta.isDrill && <span className="result-badge perfect">💎 완벽! 무결점</span>}
+        {isRecord && <span className="result-badge record">신기록</span>}
+        {isFirst && <span className="result-badge first">첫 기록</span>}
+        {perfect && !meta.isDrill && <span className="result-badge perfect">무결점</span>}
+      </div>
 
-        <div className="result-score">
-          <span className="result-score-num">{Math.round(score)}</span>
-          <span className="result-score-unit">{unit}</span>
+      <div className="res-top">
+        <div className="res-headline">
+          <div className="res-big">
+            <div className="res-big-num">{Math.round(score)}</div>
+            <div className="res-big-label">{unit}</div>
+          </div>
+          <div className="res-big sub">
+            <div className="res-big-num">{Math.round(result.accuracy)}%</div>
+            <div className="res-big-label">정확도</div>
+          </div>
         </div>
-        <div className="result-context">
-          {meta.textTitle} · {MODE_LABELS[meta.mode]}
+        <div className="res-graph">
+          <LineChart
+            series={[
+              { values: wpmSeries, color: 'var(--main)' },
+              { values: rawSeries, color: 'var(--sub)' },
+            ]}
+            height={180}
+            unit="wpm"
+            xLabel="시간(초)"
+          />
         </div>
       </div>
 
-      <div className="result-stats">
-        <ResultStat value={`${result.accuracy}%`} label="정확도" tone={result.accuracy >= 97 ? 'good' : result.accuracy >= 90 ? '' : 'warn'} />
-        <ResultStat value={`${result.consistency}%`} label="일관성" />
-        <ResultStat value={Math.round(result.rawWpm)} label="Raw WPM" />
-        <ResultStat value={result.maxCombo} label="최고 콤보" />
-        <ResultStat value={result.errorCount} label="오타" tone={result.errorCount > 0 ? 'warn' : 'good'} />
-        <ResultStat value={formatDuration(result.durationMs)} label="시간" />
-        <ResultStat value={`${result.charCount}자`} label="분량" />
-        <ResultStat value={`${result.strokeCount}타`} label="총 타수" />
-      </div>
-
-      <div className="card chart-card">
-        <div className="card-head">
-          <span>속도 추이</span>
-          <span className="legend">
-            <i className="dot" style={{ background: '#7c5cff' }} /> WPM
-            <i className="dot" style={{ background: '#5b6172' }} /> Raw
-          </span>
-        </div>
-        <LineChart
-          series={[
-            { values: wpmSeries, color: '#7c5cff' },
-            { values: rawSeries, color: '#5b6172' },
-          ]}
-          height={170}
-          unit="WPM"
-          xLabel="시간(초) →"
-        />
+      <div className="res-substats">
+        <Sub label="유형" value={typeLabel} />
+        <Sub label="raw" value={Math.round(result.rawWpm)} />
+        <Sub label="일관성" value={`${result.consistency}%`} />
+        <Sub label="오타" value={result.errorCount} />
+        <Sub label="최고 콤보" value={result.maxCombo} />
+        <Sub label="분량" value={`${result.charCount}자`} />
+        <Sub label="총 타수" value={`${result.strokeCount}타`} />
+        <Sub label="시간" value={formatDuration(result.durationMs)} />
       </div>
 
       {!perfect && (
-        <div className="card drill-card">
+        <div className="drill-card">
           <div className="drill-info">
-            <div className="drill-title">🎯 틀린 부분 반복 연습</div>
+            <div className="drill-title">틀린 부분 반복 연습</div>
             <div className="drill-sub">
-              {errorWords > 0
-                ? `오타가 난 ${errorWords}개 단어를 모아 집중 연습할 수 있어요.`
-                : '문장 부호/공백에서 오타가 있었어요.'}
+              {errorWords > 0 ? `오타가 난 ${errorWords}개 단어를 모아 집중 연습합니다.` : '문장 부호/공백 오타가 있었어요.'}
             </div>
           </div>
           <button
             className="btn accent"
             disabled={!drillText}
             onClick={() =>
-              startDrill({
-                text: drillText,
-                language: meta.language,
-                title: `${meta.textTitle}`,
-                sourceTextId: meta.textId,
-              })
+              startDrill({ text: drillText, language: meta.language, title: meta.textTitle, sourceTextId: meta.textId })
             }
           >
-            오답 연습 시작
+            <IconTarget size={16} /> 오답 연습
           </button>
         </div>
       )}
 
       <div className="results-actions">
-        <button className="btn primary" onClick={retry}>
-          ↻ 다시 도전
+        <button className="btn primary" onClick={next} title="다음 글">
+          <IconForward size={16} /> 다음 글
         </button>
-        <button className="btn" onClick={next}>
-          다음 글 →
-        </button>
-        <button className="btn ghost" onClick={() => openLibrary(meta.mode === 'mixed' ? 'mixed' : meta.language)}>
-          도서관
-        </button>
-        <button className="btn ghost" onClick={goRankings}>
-          랭킹
+        <button className="btn" onClick={retry} title="다시">
+          <IconRedo size={16} /> 다시
         </button>
       </div>
     </div>
   )
 }
 
-function ResultStat({ value, label, tone }: { value: string | number; label: string; tone?: string }) {
+function Sub({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className={`rstat ${tone ? `tone-${tone}` : ''}`}>
-      <div className="rstat-value">{value}</div>
-      <div className="rstat-label">{label}</div>
+    <div className="res-sub">
+      <div className="res-sub-label">{label}</div>
+      <div className="res-sub-value">{value}</div>
     </div>
   )
 }

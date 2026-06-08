@@ -12,6 +12,7 @@ import {
 } from '../lib/stats'
 import { formatDuration, formatTimeAgo } from '../lib/metrics'
 import { sound } from '../lib/sound'
+import { THEMES } from '../data/themes'
 import type { KeySoundProfile } from '../types'
 
 const SOUND_PROFILES: { id: KeySoundProfile; label: string }[] = [
@@ -118,6 +119,31 @@ export function ProfilePage() {
         )}
       </div>
 
+      {/* Theme */}
+      <div className="card">
+        <div className="card-head">
+          <span>테마</span>
+        </div>
+        <div className="theme-grid">
+          {THEMES.map((t) => (
+            <button
+              key={t.id}
+              className={`theme-swatch ${settings.theme === t.id ? 'on' : ''}`}
+              style={{ background: t.bg, color: t.text }}
+              onClick={() => updateSettings({ theme: t.id })}
+              aria-pressed={settings.theme === t.id}
+            >
+              <span className="ts-name">{t.name}</span>
+              <span className="ts-dots">
+                <i style={{ background: t.main }} />
+                <i style={{ background: t.sub }} />
+                <i style={{ background: t.text }} />
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Settings */}
       <div className="card settings">
         <div className="card-head">
@@ -125,7 +151,7 @@ export function ProfilePage() {
         </div>
         <div className="setting-row">
           <label>사운드</label>
-          <Toggle on={settings.soundEnabled} onChange={(v) => updateSettings({ soundEnabled: v })} />
+          <Toggle on={settings.soundEnabled} label="사운드" onChange={(v) => updateSettings({ soundEnabled: v })} />
         </div>
         <div className="setting-row">
           <label>음량</label>
@@ -135,6 +161,7 @@ export function ProfilePage() {
             max={1}
             step={0.05}
             value={settings.volume}
+            aria-label="음량"
             onChange={(e) => {
               const v = Number(e.target.value)
               updateSettings({ volume: v })
@@ -164,16 +191,25 @@ export function ProfilePage() {
         </div>
         <div className="setting-row">
           <label>이펙트 (파티클/진동)</label>
-          <Toggle on={settings.effectsEnabled} onChange={(v) => updateSettings({ effectsEnabled: v })} />
+          <Toggle on={settings.effectsEnabled} label="이펙트" onChange={(v) => updateSettings({ effectsEnabled: v })} />
+        </div>
+        <div className="setting-row">
+          <label>부드러운 캐럿</label>
+          <Toggle on={settings.smoothCaret} label="부드러운 캐럿" onChange={(v) => updateSettings({ smoothCaret: v })} />
+        </div>
+        <div className="setting-row">
+          <label>실시간 지표 표시</label>
+          <Toggle on={settings.showLiveStats} label="실시간 지표 표시" onChange={(v) => updateSettings({ showLiveStats: v })} />
         </div>
         <div className="setting-row">
           <label>글자 크기 ({settings.fontSize}px)</label>
           <input
             type="range"
-            min={20}
-            max={44}
+            min={22}
+            max={56}
             step={1}
             value={settings.fontSize}
+            aria-label="글자 크기"
             onChange={(e) => updateSettings({ fontSize: Number(e.target.value) })}
           />
         </div>
@@ -259,9 +295,15 @@ function Mini({ label, value }: { label: string; value: string | number }) {
   )
 }
 
-function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label?: string }) {
   return (
-    <button className={`toggle ${on ? 'on' : ''}`} onClick={() => onChange(!on)} role="switch" aria-checked={on}>
+    <button
+      className={`toggle ${on ? 'on' : ''}`}
+      onClick={() => onChange(!on)}
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+    >
       <span className="toggle-knob" />
     </button>
   )

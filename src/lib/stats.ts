@@ -66,14 +66,17 @@ export function summarize(sessions: SessionResult[]): ProfileSummary {
       level: 1, xp: 0, xpInLevel: 0, xpForNextLevel: 600,
     }
   }
+  // Best / average / XP exclude drill runs (short, error-heavy by design) so
+  // they don't inflate records or contradict the leaderboard. Totals keep all.
+  const ranked = sessions.filter((s) => !s.isDrill)
   const totalChars = sessions.reduce((a, s) => a + s.charCount, 0)
   const totalStrokes = sessions.reduce((a, s) => a + s.strokeCount, 0)
   const totalTimeMs = sessions.reduce((a, s) => a + s.durationMs, 0)
-  const avgAccuracy = sessions.reduce((a, s) => a + s.accuracy, 0) / sessions.length
-  const avgWpm = sessions.reduce((a, s) => a + s.wpm, 0) / sessions.length
-  const bestWpm = Math.max(...sessions.map((s) => s.wpm))
-  const bestCpm = Math.max(...sessions.map((s) => s.cpm))
-  const xp = sessions.reduce((a, s) => a + xpForSession(s), 0)
+  const avgAccuracy = ranked.length ? ranked.reduce((a, s) => a + s.accuracy, 0) / ranked.length : 0
+  const avgWpm = ranked.length ? ranked.reduce((a, s) => a + s.wpm, 0) / ranked.length : 0
+  const bestWpm = ranked.length ? Math.max(...ranked.map((s) => s.wpm)) : 0
+  const bestCpm = ranked.length ? Math.max(...ranked.map((s) => s.cpm)) : 0
+  const xp = ranked.reduce((a, s) => a + xpForSession(s), 0)
   const lvl = levelFromXp(xp)
   return {
     totalSessions: sessions.length,

@@ -17,8 +17,10 @@ export const DEFAULT_SETTINGS: Settings = {
   volume: 0.6,
   effectsEnabled: true,
   keySoundProfile: 'thock',
-  fontSize: 30,
+  fontSize: 32,
   showLiveStats: true,
+  theme: 'serika-dark',
+  smoothCaret: true,
 }
 
 interface AppState {
@@ -27,7 +29,9 @@ interface AppState {
   sessions: SessionResult[]
   settings: Settings
   hydrated: boolean
+  typingActive: boolean
 
+  setTyping: (active: boolean) => void
   ensureDefaultProfile: () => void
   addProfile: (name: string) => Profile
   selectProfile: (id: string) => void
@@ -47,6 +51,9 @@ export const useAppStore = create<AppState>()(
       sessions: [],
       settings: DEFAULT_SETTINGS,
       hydrated: false,
+      typingActive: false,
+
+      setTyping: (active) => set({ typingActive: active }),
 
       ensureDefaultProfile: () => {
         const { profiles } = get()
@@ -111,6 +118,15 @@ export const useAppStore = create<AppState>()(
         sessions: s.sessions,
         settings: s.settings,
       }),
+      // Deep-merge settings so newly added keys (e.g. theme) get their defaults.
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<AppState>
+        return {
+          ...current,
+          ...p,
+          settings: { ...current.settings, ...(p.settings ?? {}) },
+        }
+      },
       onRehydrateStorage: () => (state) => {
         state?.ensureDefaultProfile()
         useAppStore.setState({ hydrated: true })

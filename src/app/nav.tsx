@@ -1,10 +1,16 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import type { Genre, Language, PracticeMode } from '../types'
+import type { Difficulty, Genre, Language, PracticeMode } from '../types'
 import type { EngineResult } from '../hooks/useTypingEngine'
-import { pickRandom, passagesFor } from '../data'
+import { pickRandom } from '../data'
 import { useAppStore } from '../store/useAppStore'
 
-export type Screen = 'home' | 'library' | 'practice' | 'results' | 'rankings' | 'profile'
+export type Screen = 'practice' | 'library' | 'results' | 'rankings' | 'profile'
+
+export interface TestConfig {
+  mode: PracticeMode
+  genre: Genre | 'all'
+  difficulty: Difficulty | 'all'
+}
 
 export interface Drill {
   text: string
@@ -31,6 +37,7 @@ export interface LastResult {
 interface NavValue {
   screen: Screen
   space: PracticeMode
+  config: TestConfig
   queue: string[]
   index: number
   drill: Drill | null
@@ -38,12 +45,14 @@ interface NavValue {
   lastResult: LastResult | null
 
   goHome: () => void
-  openLibrary: (space: PracticeMode) => void
+  openLibrary: (space?: PracticeMode) => void
   goRankings: () => void
   goProfile: () => void
+  setConfig: (partial: Partial<TestConfig>) => void
+  reroll: () => void
   startPassage: (id: string, space?: PracticeMode) => void
   startRandom: (space: PracticeMode) => void
-  startMixed: (count?: number) => void
+  startMixed: () => void
   retry: () => void
   next: () => void
   startDrill: (drill: Drill) => void
@@ -58,34 +67,27 @@ export function useNav(): NavValue {
   return ctx
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = arr.slice()
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
+function pickFor(cfg: TestConfig, excludeId?: string) {
+  const language: Language | undefined = cfg.mode === 'mixed' ? undefined : cfg.mode
+  return pickRandom({
+    language,
+    genre: cfg.genre === 'all' ? undefined : cfg.genre,
+    difficulty: cfg.difficulty === 'all' ? undefined : cfg.difficulty,
+    excludeId,
+  })
 }
 
-/** Interleave Korean and English passages for a mixed-mode run. */
-function buildMixedQueue(count: number): string[] {
-  const half = Math.ceil(count / 2)
-  const ko = shuffle(passagesFor({ language: 'ko' })).slice(0, half).map((p) => p.id)
-  const en = shuffle(passagesFor({ language: 'en' })).slice(0, half).map((p) => p.id)
-  const out: string[] = []
-  for (let i = 0; i < half; i++) {
-    if (ko[i]) out.push(ko[i])
-    if (en[i]) out.push(en[i])
-  }
-  return out.slice(0, count)
-}
+const DEFAULT_CONFIG: TestConfig = { mode: 'ko', genre: 'all', difficulty: 'all' }
 
 export function NavProvider({ children }: { children: ReactNode }) {
   const recordSession = useAppStore((s) => s.recordSession)
 
-  const [screen, setScreen] = useState<Screen>('home')
-  const [space, setSpace] = useState<PracticeMode>('ko')
-  const [queue, setQueue] = useState<string[]>([])
+  const [screen, setScreen] = useState<Screen>('practice')
+  const [config, setConfigState] = useState<TestConfig>(DEFAULT_CONFIG)
+  const [queue, setQueue] = useState<string[]>(() => {
+    const p = pickFor(DEFAULT_CONFIG)
+    return p ? [p.id] : []
+  })
   const [index, setIndex] = useState(0)
   const [drill, setDrill] = useState<Drill | null>(null)
   const [runId, setRunId] = useState(0)
@@ -93,18 +95,42 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const bump = useCallback(() => setRunId((r) => r + 1), [])
 
-  const goHome = useCallback(() => setScreen('home'), [])
+  const startWith = useCallback(
+    (cfg: TestConfig, excludeId?: string) => {
+      const p = pickFor(cfg, excludeId)
+      setQueue(p ? [p.id] : [])
+      setIndex(0)
+      setDrill(null)
+      bump()
+      setScreen('practice')
+    },
+    [bump],
+  )
+
+  const setConfig = useCallback(
+    (partial: Partial<TestConfig>) => {
+      setConfigState((prev) => {
+        const cfg = { ...prev, ...partial }
+        startWith(cfg)
+        return cfg
+      })
+    },
+    [startWith],
+  )
+
+  const reroll = useCallback(() => startWith(config, queue[index]), [startWith, config, queue, index])
+  const goHome = useCallback(() => reroll(), [reroll])
+
+  const openLibrary = useCallback((space?: PracticeMode) => {
+    if (space) setConfigState((prev) => ({ ...prev, mode: space }))
+    setScreen('library')
+  }, [])
   const goRankings = useCallback(() => setScreen('rankings'), [])
   const goProfile = useCallback(() => setScreen('profile'), [])
 
-  const openLibrary = useCallback((s: PracticeMode) => {
-    setSpace(s)
-    setScreen('library')
-  }, [])
-
   const startPassage = useCallback(
-    (id: string, s?: PracticeMode) => {
-      if (s) setSpace(s)
+    (id: string, space?: PracticeMode) => {
+      if (space) setConfigState((prev) => ({ ...prev, mode: space }))
       setQueue([id])
       setIndex(0)
       setDrill(null)
@@ -114,32 +140,8 @@ export function NavProvider({ children }: { children: ReactNode }) {
     [bump],
   )
 
-  const startRandom = useCallback(
-    (s: PracticeMode) => {
-      setSpace(s)
-      const lang: Language | undefined = s === 'mixed' ? undefined : s
-      const p = pickRandom({ language: lang })
-      if (!p) return
-      setQueue([p.id])
-      setIndex(0)
-      setDrill(null)
-      bump()
-      setScreen('practice')
-    },
-    [bump],
-  )
-
-  const startMixed = useCallback(
-    (count = 6) => {
-      setSpace('mixed')
-      setQueue(buildMixedQueue(count))
-      setIndex(0)
-      setDrill(null)
-      bump()
-      setScreen('practice')
-    },
-    [bump],
-  )
+  const startRandom = useCallback((space: PracticeMode) => setConfig({ mode: space }), [setConfig])
+  const startMixed = useCallback(() => setConfig({ mode: 'mixed' }), [setConfig])
 
   const retry = useCallback(() => {
     bump()
@@ -148,21 +150,15 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const next = useCallback(() => {
     setDrill(null)
-    setIndex((i) => {
-      const nextIdx = i + 1
-      if (nextIdx < queue.length) {
-        bump()
-        return nextIdx
-      }
-      // endless mode: append a fresh passage matching the current space
-      const lang: Language | undefined = space === 'mixed' ? (i % 2 === 0 ? 'en' : 'ko') : space
-      const p = pickRandom({ language: lang, excludeId: queue[i] })
-      if (p) setQueue((q) => [...q, p.id])
-      bump()
-      return nextIdx
-    })
+    const cur = queue[index]
+    const p = pickFor(config, cur)
+    if (p) {
+      setQueue((q) => [...q, p.id])
+      setIndex((i) => i + 1)
+    }
+    bump()
     setScreen('practice')
-  }, [queue, space, bump])
+  }, [queue, index, config, bump])
 
   const startDrill = useCallback(
     (d: Drill) => {
@@ -201,13 +197,13 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<NavValue>(
     () => ({
-      screen, space, queue, index, drill, runId, lastResult,
-      goHome, openLibrary, goRankings, goProfile,
+      screen, space: config.mode, config, queue, index, drill, runId, lastResult,
+      goHome, openLibrary, goRankings, goProfile, setConfig, reroll,
       startPassage, startRandom, startMixed, retry, next, startDrill, finishPractice,
     }),
     [
-      screen, space, queue, index, drill, runId, lastResult,
-      goHome, openLibrary, goRankings, goProfile,
+      screen, config, queue, index, drill, runId, lastResult,
+      goHome, openLibrary, goRankings, goProfile, setConfig, reroll,
       startPassage, startRandom, startMixed, retry, next, startDrill, finishPractice,
     ],
   )

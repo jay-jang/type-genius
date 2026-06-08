@@ -3,9 +3,9 @@ import { NavProvider, useNav } from './app/nav'
 import { useAppStore } from './store/useAppStore'
 import { sound } from './lib/sound'
 import { TopBar } from './components/TopBar'
-import { HomePage } from './pages/HomePage'
-import { LibraryPage } from './pages/LibraryPage'
+import { BottomBar } from './components/BottomBar'
 import { PracticePage } from './pages/PracticePage'
+import { LibraryPage } from './pages/LibraryPage'
 import { ResultsPage } from './pages/ResultsPage'
 import { RankingsPage } from './pages/RankingsPage'
 import { ProfilePage } from './pages/ProfilePage'
@@ -13,21 +13,44 @@ import { ProfilePage } from './pages/ProfilePage'
 function Screens() {
   const { screen } = useNav()
   switch (screen) {
-    case 'home':
-      return <HomePage />
     case 'library':
       return <LibraryPage />
-    case 'practice':
-      return <PracticePage />
     case 'results':
       return <ResultsPage />
     case 'rankings':
       return <RankingsPage />
     case 'profile':
       return <ProfilePage />
+    case 'practice':
     default:
-      return <HomePage />
+      return <PracticePage />
   }
+}
+
+function Shell() {
+  const { screen, openLibrary, goHome } = useNav()
+  const typingActive = useAppStore((s) => s.typingActive)
+
+  // Esc: from the test → pick a text; from elsewhere → back to the test.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      if (screen === 'practice') openLibrary()
+      else goHome()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [screen, openLibrary, goHome])
+
+  return (
+    <div className={`app ${typingActive ? 'app--focus' : ''}`}>
+      <TopBar />
+      <main className="app-main">
+        <Screens />
+      </main>
+      <BottomBar />
+    </div>
+  )
 }
 
 export default function App() {
@@ -38,6 +61,21 @@ export default function App() {
     ensureDefaultProfile()
   }, [ensureDefaultProfile])
 
+  // Apply the selected Monkeytype-style theme to the document.
+  useEffect(() => {
+    document.documentElement.dataset.theme = settings.theme || 'serika-dark'
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()
+    if (bg) {
+      let meta = document.querySelector('meta[name="theme-color"]')
+      if (!meta) {
+        meta = document.createElement('meta')
+        meta.setAttribute('name', 'theme-color')
+        document.head.appendChild(meta)
+      }
+      meta.setAttribute('content', bg)
+    }
+  }, [settings.theme])
+
   // Keep the audio engine in sync with user settings.
   useEffect(() => {
     sound.setEnabled(settings.soundEnabled)
@@ -47,13 +85,7 @@ export default function App() {
 
   return (
     <NavProvider>
-      <div className="app">
-        <div className="app-bg" aria-hidden />
-        <TopBar />
-        <main className="app-main">
-          <Screens />
-        </main>
-      </div>
+      <Shell />
     </NavProvider>
   )
 }

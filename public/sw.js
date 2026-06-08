@@ -34,8 +34,10 @@ self.addEventListener('fetch', (event) => {
       (async () => {
         try {
           const net = await fetch(req)
-          const cache = await caches.open(VERSION)
-          cache.put(BASE + 'index.html', net.clone())
+          if (net.ok && net.type === 'basic') {
+            const cache = await caches.open(VERSION)
+            cache.put(BASE + 'index.html', net.clone())
+          }
           return net
         } catch {
           return (await caches.match(BASE + 'index.html')) || (await caches.match(BASE)) || Response.error()

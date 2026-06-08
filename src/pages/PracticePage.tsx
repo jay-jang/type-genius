@@ -1,24 +1,24 @@
 import { useNav, type PracticeMeta } from '../app/nav'
 import { getPassage, GENRE_LABELS, DIFFICULTY_LABELS } from '../data'
-import { MODE_LABELS } from '../lib/stats'
+import { ConfigBar } from '../components/ConfigBar'
 import { TypingArea } from '../components/TypingArea'
 
 export function PracticePage() {
-  const { space, queue, index, drill, runId, next, finishPractice, goHome } = useNav()
+  const { config, queue, index, drill, runId, reroll, finishPractice } = useNav()
 
   let target: string
   let meta: PracticeMeta
   let title: string
-  let subtitle: string
-  let badge: string
+  let subtitle: string | undefined
+  let badge: string | undefined
 
   if (drill) {
     target = drill.text
     title = drill.title
-    subtitle = '틀린 단어를 반복해 손에 익히세요'
+    subtitle = '틀린 단어 집중 연습'
     badge = '오답 연습'
     meta = {
-      mode: space,
+      mode: config.mode,
       language: drill.language,
       genre: 'drill',
       textId: drill.sourceTextId,
@@ -30,20 +30,22 @@ export function PracticePage() {
     const p = getPassage(queue[index])
     if (!p) {
       return (
-        <div className="screen center-screen">
-          <p className="empty-msg">연습할 글을 찾을 수 없어요.</p>
-          <button className="btn primary" onClick={goHome}>
-            홈으로
-          </button>
+        <div className="screen test-screen">
+          <ConfigBar />
+          <div className="center-screen">
+            <p className="empty-msg">조건에 맞는 글이 없어요.</p>
+            <button className="btn primary" onClick={reroll}>
+              다른 글 가져오기
+            </button>
+          </div>
         </div>
       )
     }
     target = p.text
     title = p.title
     subtitle = `${p.author} · ${GENRE_LABELS[p.genre]} · ${DIFFICULTY_LABELS[p.difficulty]}`
-    badge = `${MODE_LABELS[space]} 모드`
     meta = {
-      mode: space,
+      mode: config.mode,
       language: p.language,
       genre: p.genre,
       textId: p.id,
@@ -53,27 +55,9 @@ export function PracticePage() {
     }
   }
 
-  const showQueue = !drill && queue.length > 1
-
   return (
-    <div className="screen practice-screen">
-      <div className="practice-toolbar">
-        <button className="btn ghost" onClick={goHome}>
-          ← 나가기
-        </button>
-        <div className="toolbar-info">
-          {showQueue && (
-            <span className="queue-count">
-              {index + 1} / {queue.length}
-            </span>
-          )}
-          <span className="mode-pill">{MODE_LABELS[space]}</span>
-        </div>
-        <button className="btn ghost" onClick={next}>
-          다음 글 →
-        </button>
-      </div>
-
+    <div className="screen test-screen">
+      <ConfigBar />
       <TypingArea
         key={runId}
         target={target}

@@ -2,7 +2,17 @@
 // no deps — particles are short-lived absolutely-positioned nodes that remove
 // themselves when their animation finishes. Coordinates are relative to `layer`.
 
-const ACCENTS = ['#7c5cff', '#ff5c8a', '#22d3ee', '#34d399', '#fbbf24']
+const FALLBACK = ['#e2b714', '#d1d0c5', '#ca4754']
+
+/** Read the live theme palette so effects match the current Monkeytype theme. */
+function themeColors(): string[] {
+  if (typeof document === 'undefined') return FALLBACK
+  const s = getComputedStyle(document.documentElement)
+  const cols = ['--main', '--text', '--error']
+    .map((v) => s.getPropertyValue(v).trim())
+    .filter(Boolean)
+  return cols.length ? cols : FALLBACK
+}
 
 interface BurstOpts {
   count?: number
@@ -13,7 +23,7 @@ interface BurstOpts {
 }
 
 export function spawnBurst(layer: HTMLElement, x: number, y: number, opts: BurstOpts = {}): void {
-  const { count = 5, colors = ACCENTS, power = 55, size = 6, up = true } = opts
+  const { count = 5, colors = themeColors(), power = 55, size = 6, up = true } = opts
   for (let i = 0; i < count; i++) {
     const el = document.createElement('div')
     el.className = 'fx-particle'
@@ -40,13 +50,14 @@ export function spawnConfetti(layer: HTMLElement, pieces = 90): void {
   const rect = layer.getBoundingClientRect()
   const w = rect.width || 600
   const h = rect.height || 400
+  const colors = themeColors()
   for (let i = 0; i < pieces; i++) {
     const el = document.createElement('div')
     el.className = 'fx-confetti'
     const sz = 6 + Math.random() * 8
     el.style.cssText = `left:${Math.random() * w}px;top:-20px;width:${sz}px;height:${
       sz * 0.5
-    }px;background:${ACCENTS[(Math.random() * ACCENTS.length) | 0]};`
+    }px;background:${colors[(Math.random() * colors.length) | 0]};`
     layer.appendChild(el)
     const drift = (Math.random() - 0.5) * 200
     const rot = (Math.random() - 0.5) * 1080
