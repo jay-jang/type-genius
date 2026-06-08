@@ -20,6 +20,7 @@ export function ConfigBar() {
           <button
             key={m.id}
             className={`config-opt ${config.mode === m.id ? 'on' : ''}`}
+            aria-pressed={config.mode === m.id}
             onClick={() => setConfig({ mode: m.id })}
           >
             {m.label}
@@ -30,13 +31,18 @@ export function ConfigBar() {
       <span className="config-sep" />
 
       <div className="config-group">
-        <button className={`config-opt ${config.genre === 'all' ? 'on' : ''}`} onClick={() => setConfig({ genre: 'all' })}>
+        <button
+          className={`config-opt ${config.genre === 'all' ? 'on' : ''}`}
+          aria-pressed={config.genre === 'all'}
+          onClick={() => setConfig({ genre: 'all' })}
+        >
           전체
         </button>
         {GENRES.map((g: Genre) => (
           <button
             key={g}
             className={`config-opt ${config.genre === g ? 'on' : ''}`}
+            aria-pressed={config.genre === g}
             onClick={() => setConfig({ genre: g })}
           >
             {GENRE_LABELS[g]}
@@ -51,6 +57,7 @@ export function ConfigBar() {
           <button
             key={d}
             className={`config-opt ${config.difficulty === d ? 'on' : ''}`}
+            aria-pressed={config.difficulty === d}
             onClick={() => setConfig({ difficulty: d })}
           >
             {d === 'all' ? '난이도' : DIFFICULTY_LABELS[d]}

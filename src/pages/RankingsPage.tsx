@@ -24,7 +24,7 @@ export function RankingsPage() {
         <h1 className="page-title">🏆 랭킹</h1>
         <div className="seg">
           {MODES.map((m) => (
-            <button key={m} className={`seg-btn ${mode === m ? 'on' : ''}`} onClick={() => setMode(m)}>
+            <button key={m} className={`seg-btn ${mode === m ? 'on' : ''}`} aria-pressed={mode === m} onClick={() => setMode(m)}>
               {MODE_LABELS[m]}
             </button>
           ))}

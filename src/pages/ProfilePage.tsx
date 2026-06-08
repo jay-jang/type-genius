@@ -166,7 +166,7 @@ export function ProfilePage() {
               const v = Number(e.target.value)
               updateSettings({ volume: v })
               sound.setVolume(v)
-              sound.key()
+              if (settings.soundEnabled) sound.key()
             }}
           />
         </div>
@@ -180,8 +180,7 @@ export function ProfilePage() {
                 onClick={() => {
                   updateSettings({ keySoundProfile: sp.id })
                   sound.setProfile(sp.id)
-                  sound.setEnabled(true)
-                  sound.key()
+                  if (settings.soundEnabled) sound.key()
                 }}
               >
                 {sp.label}

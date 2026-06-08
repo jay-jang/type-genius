@@ -88,7 +88,7 @@ export function useTypingEngine(opts: EngineOptions) {
     const cpm = mins > 0 ? correctStrokes / mins : 0
     const live: LiveStats = {
       wpm: Math.round(grossWpm(correctCount, elapsed)),
-      rawWpm: Math.round(grossWpm(committedRef.current, elapsed)),
+      rawWpm: Math.round(grossWpm(enteredRef.current, elapsed)),
       cpm: Math.round(cpm),
       accuracy: Math.round(accuracyPct(enteredRef.current, errorsRef.current) * 10) / 10,
       errors: errorsRef.current,
@@ -123,7 +123,7 @@ export function useTypingEngine(opts: EngineOptions) {
       : charCount
 
     // ensure a final sample exists
-    const liveRaw = Math.round(grossWpm(committedRef.current, durationMs))
+    const liveRaw = Math.round(grossWpm(enteredRef.current, durationMs))
     samplesRef.current.push({
       t: Math.round(durationMs / 1000),
       wpm: Math.round(grossWpm(correctCount, durationMs)),
@@ -152,7 +152,10 @@ export function useTypingEngine(opts: EngineOptions) {
   const evaluate = useCallback((v: string) => {
     if (startRef.current == null && v.length > 0) startRef.current = performance.now()
     // backspaced below the committed frontier → allow re-attempt of those positions
-    if (v.length < committedRef.current) committedRef.current = v.length
+    if (v.length < committedRef.current) {
+      committedRef.current = v.length
+      comboRef.current = 0 // backspacing breaks the combo streak
+    }
     while (committedRef.current < v.length) {
       const p = committedRef.current
       enteredRef.current++
@@ -247,7 +250,7 @@ export function useTypingEngine(opts: EngineOptions) {
       ref: taRef,
       defaultValue: '',
       onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-        handleValue(e.currentTarget.value, composingRef.current),
+        handleValue(e.currentTarget.value, composingRef.current || (e.nativeEvent as InputEvent).isComposing),
       onCompositionStart: () => {
         composingRef.current = true
         setIsComposing(true)

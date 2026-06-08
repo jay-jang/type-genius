@@ -54,7 +54,7 @@ self.addEventListener('fetch', (event) => {
       if (cached) return cached
       try {
         const net = await fetch(req)
-        if (net.ok && (url.pathname.includes('/assets/') || CORE.includes(url.pathname))) {
+        if (net.ok && net.type === 'basic' && (url.pathname.includes('/assets/') || CORE.includes(url.pathname))) {
           const cache = await caches.open(VERSION)
           cache.put(req, net.clone())
         }

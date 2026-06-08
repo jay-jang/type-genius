@@ -14,10 +14,11 @@ interface LineChartProps {
   height?: number
   unit?: string
   xLabel?: string
+  ariaLabel?: string
 }
 
 /** Minimal dependency-free SVG line chart with gradient area fill. */
-export function LineChart({ series, height = 160, unit = '', xLabel }: LineChartProps) {
+export function LineChart({ series, height = 160, unit = '', xLabel, ariaLabel }: LineChartProps) {
   const id = useId()
   const W = 600
   const H = height
@@ -50,7 +51,13 @@ export function LineChart({ series, height = 160, unit = '', xLabel }: LineChart
   const gridLines = [0, 0.25, 0.5, 0.75, 1]
 
   return (
-    <svg className="linechart" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img">
+    <svg
+      className="linechart"
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label={ariaLabel ?? '속도 추이 그래프'}
+    >
       <defs>
         {series.map((s, si) => (
           <linearGradient key={si} id={`${id}-grad-${si}`} x1="0" y1="0" x2="0" y2="1">

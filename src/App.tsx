@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { NavProvider, useNav } from './app/nav'
 import { useAppStore } from './store/useAppStore'
 import { sound } from './lib/sound'
+import { isValidTheme, DEFAULT_THEME } from './data/themes'
 import { TopBar } from './components/TopBar'
 import { BottomBar } from './components/BottomBar'
 import { PracticePage } from './pages/PracticePage'
@@ -63,7 +64,9 @@ export default function App() {
 
   // Apply the selected Monkeytype-style theme to the document.
   useEffect(() => {
-    document.documentElement.dataset.theme = settings.theme || 'serika-dark'
+    // Validate against the known palette so a stale/corrupt id falls back safely.
+    const theme = isValidTheme(settings.theme) ? settings.theme : DEFAULT_THEME
+    document.documentElement.dataset.theme = theme
     const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()
     if (bg) {
       let meta = document.querySelector('meta[name="theme-color"]')

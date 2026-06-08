@@ -61,13 +61,3 @@ export function pickRandom(opts: PassageFilter & { excludeId?: string } = {}): P
   if (!chosen.length) return ALL_PASSAGES[0]
   return chosen[Math.floor(Math.random() * chosen.length)]
 }
-
-/** Count of passages per genre for a language — used by the library overview. */
-export function genreCounts(language?: Language): Record<Genre, number> {
-  const counts = { poem: 0, novel: 0, song: 0, nonfiction: 0 } as Record<Genre, number>
-  for (const p of ALL_PASSAGES) {
-    if (language && p.language !== language) continue
-    counts[p.genre]++
-  }
-  return counts
-}
