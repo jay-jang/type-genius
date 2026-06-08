@@ -1515,4 +1515,64 @@ kbd {
   .setting-row input[type='range'] {
     width: 130px;
   }
+  .app-main {
+    padding: 18px 14px 64px;
+  }
+  .topbar {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .topnav {
+    margin-left: 0;
+    gap: 0;
+  }
+  .navlink {
+    padding: 7px 8px;
+    font-size: 0.85rem;
+  }
+  .brand-name {
+    font-size: 1rem;
+  }
+  .profile-name {
+    max-width: 70px;
+  }
+  .typing-surface,
+  .capture {
+    padding: 20px 16px;
+  }
+  .practice-head {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 430px) {
+  .brand-name,
+  .profile-name {
+    display: none;
+  }
+  .navlink {
+    font-size: 0.8rem;
+    padding: 6px 7px;
+  }
+  .result-score-num {
+    font-size: 3.4rem;
+  }
+  .results-actions .btn {
+    flex: 1 1 40%;
+  }
+}
+
+/* Respect users who prefer reduced motion — tame the juice. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .caret {
+    animation: none;
+    opacity: 1;
+  }
 }

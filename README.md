@@ -22,6 +22,57 @@ npm run build     # dist/ 생성
 npm run preview   # 빌드 결과 실행 (http://localhost:4173)
 ```
 
+## 원격 배포 (Deployment)
+
+백엔드가 없는 정적 SPA라 어떤 정적 호스트에도 올릴 수 있습니다.
+
+### 1) 자체 서버에서 바로 서빙 (의존성 0)
+
+`server.mjs` 는 의존성 없는 Node 정적 서버로, `dist/` 를 `0.0.0.0` 에 서빙하고
+SPA 폴백·캐시 헤더·올바른 MIME 를 처리합니다.
+
+```bash
+npm run build
+PORT=8080 HOST=0.0.0.0 node server.mjs   # 또는: npm start
+```
+
+리버스 프록시(Nginx/Caddy)나 터널(cloudflared/ngrok) 뒤에 두면 외부에서 접속됩니다.
+빠른 공개 URL 예시:
+
+```bash
+cloudflared tunnel --url http://localhost:8080   # https://<random>.trycloudflare.com
+```
+
+### 2) systemd 로 상시 구동 (서버 + 터널 자동 재시작)
+
+리포에 `deploy/` 의 유닛 예시가 있습니다.
+
+```bash
+sudo cp deploy/typegenius.service deploy/typegenius-tunnel.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now typegenius typegenius-tunnel
+# 현재 공개 URL 확인:
+sudo journalctl -u typegenius-tunnel -o cat | grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' | tail -1
+```
+
+### 3) Docker
+
+```bash
+docker build -t typegenius .
+docker run -p 8080:8080 typegenius   # http://localhost:8080
+```
+
+### 4) 정적 호스트 (Netlify / Vercel / GitHub Pages)
+
+- **Netlify / Vercel**: 리포 연결만 하면 `netlify.toml` / `vercel.json` 설정으로
+  자동 빌드·배포됩니다. (빌드: `npm run build`, 퍼블리시: `dist`)
+- **GitHub Pages**: `.github/workflows/deploy.yml` 포함. `Settings → Pages →
+  Source: GitHub Actions` 로 켜면 됩니다. 하위 경로(`/type-genius/`)로 빌드되도록
+  `BASE_PATH` 가 설정되어 있습니다. (비공개 리포는 Pro 필요, 게시 사이트는 공개)
+
+> PWA: 매니페스트 + 서비스 워커가 포함되어, 첫 방문 이후 **오프라인**으로 동작하고
+> 모바일에 **설치**할 수 있습니다. (`BASE_URL` 기반이라 루트/하위경로 모두 동작)
+
 ## 주요 기능
 
 - **언어별 연습 공간**: 한국어 / English 를 분리하고, **복합(mixed) 모드**로 두

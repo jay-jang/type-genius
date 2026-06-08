@@ -18,7 +18,9 @@ interface TypingAreaProps {
 
 export function TypingArea({ target, language, title, subtitle, badge, onFinish }: TypingAreaProps) {
   const settings = useAppStore((s) => s.settings)
-  const effectsOn = settings.effectsEnabled
+  const prefersReducedMotion =
+    typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const effectsOn = settings.effectsEnabled && !prefersReducedMotion
 
   const stageRef = useRef<HTMLDivElement | null>(null)
   const surfaceRef = useRef<HTMLDivElement | null>(null)

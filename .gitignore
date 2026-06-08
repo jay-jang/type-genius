@@ -6,3 +6,9 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 npm-debug.log*
+
+# runtime tunnel URL (ephemeral)
+.tunnel-url
+
+# local verification scripts (not shipped)
+tg-*.mjs

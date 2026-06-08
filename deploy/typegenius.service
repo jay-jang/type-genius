@@ -1,0 +1,17 @@
+[Unit]
+Description=TypeGenius static server (serves dist/ on :8080)
+After=network.target
+
+[Service]
+Type=simple
+# adjust User / WorkingDirectory to your machine
+User=ubuntu
+WorkingDirectory=/home/ubuntu/workspace/type-genius
+Environment=PORT=8080
+Environment=HOST=0.0.0.0
+ExecStart=/usr/bin/node /home/ubuntu/workspace/type-genius/server.mjs
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

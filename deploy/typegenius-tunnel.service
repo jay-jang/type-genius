@@ -1,0 +1,16 @@
+[Unit]
+Description=TypeGenius cloudflared quick tunnel -> :8080
+After=network-online.target typegenius.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+# A quick tunnel gives a fresh https://<random>.trycloudflare.com URL on each start.
+# For a STABLE custom domain, run `cloudflared tunnel login` and use a named tunnel.
+ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate --url http://localhost:8080
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
