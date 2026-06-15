@@ -129,6 +129,9 @@ button {
 .empty-msg.sm {
   padding: 1rem 0;
 }
+.empty-msg.danger {
+  color: var(--error, #ca4754);
+}
 
 /* focus mode: dim chrome while typing */
 .app--focus .topbar,

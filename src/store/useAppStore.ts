@@ -41,7 +41,25 @@ interface AppState {
   updateSettings: (patch: Partial<Settings>) => void
   clearProfileSessions: (id: string) => void
   resetAll: () => void
+  exportData: () => BackupFile
+  importData: (payload: unknown) => boolean
 }
+
+/** Shape of the exported/imported backup file. */
+export interface BackupFile {
+  app: 'type-genius'
+  version: 1
+  exportedAt: number
+  data: {
+    profiles: Profile[]
+    currentProfileId: string | null
+    sessions: SessionResult[]
+    settings: Settings
+  }
+}
+
+const isObject = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -126,6 +144,36 @@ export const useAppStore = create<AppState>()(
 
       resetAll: () =>
         set({ profiles: [], currentProfileId: null, sessions: [], settings: DEFAULT_SETTINGS }),
+
+      exportData: () => {
+        const s = get()
+        return {
+          app: 'type-genius',
+          version: 1,
+          exportedAt: Date.now(),
+          data: {
+            profiles: s.profiles,
+            currentProfileId: s.currentProfileId,
+            sessions: s.sessions,
+            settings: s.settings,
+          },
+        }
+      },
+
+      importData: (payload) => {
+        if (!isObject(payload) || payload.app !== 'type-genius' || payload.version !== 1) return false
+        const data = payload.data
+        if (!isObject(data) || !Array.isArray(data.profiles) || !Array.isArray(data.sessions)) return false
+        const profiles = data.profiles as Profile[]
+        const sessions = (data.sessions as SessionResult[]).slice(-1000)
+        const settings = { ...DEFAULT_SETTINGS, ...(isObject(data.settings) ? data.settings : {}) } as Settings
+        // Ensure currentProfileId points at an existing profile.
+        const wanted = typeof data.currentProfileId === 'string' ? data.currentProfileId : null
+        const currentProfileId =
+          wanted && profiles.some((p) => p.id === wanted) ? wanted : (profiles[0]?.id ?? null)
+        set({ profiles, currentProfileId, sessions, settings })
+        return true
+      },
     }),
     {
       name: 'type-genius-v1',

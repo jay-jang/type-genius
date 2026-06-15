@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { LineChart } from '../components/LineChart'
 import {
@@ -32,8 +32,43 @@ export function ProfilePage() {
   const deleteProfile = useAppStore((s) => s.deleteProfile)
   const updateSettings = useAppStore((s) => s.updateSettings)
   const clearProfileSessions = useAppStore((s) => s.clearProfileSessions)
+  const exportData = useAppStore((s) => s.exportData)
+  const importData = useAppStore((s) => s.importData)
 
   const [newName, setNewName] = useState('')
+  const [backupMsg, setBackupMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const fileInput = useRef<HTMLInputElement>(null)
+
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(exportData(), null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const d = new Date()
+    const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `typegenius-backup-${stamp}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    setBackupMsg({ ok: true, text: '내보내기 완료!' })
+  }
+
+  const handleImportFile = (file: File) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const ok = importData(JSON.parse(String(reader.result)))
+        setBackupMsg(
+          ok
+            ? { ok: true, text: '가져오기 완료! 데이터가 복원되었어요.' }
+            : { ok: false, text: '올바른 TypeGenius 백업 파일이 아니에요.' },
+        )
+      } catch {
+        setBackupMsg({ ok: false, text: '파일을 읽을 수 없어요 (JSON 오류).' })
+      }
+    }
+    reader.onerror = () => setBackupMsg({ ok: false, text: '파일을 읽을 수 없어요.' })
+    reader.readAsText(file)
+  }
   const now = Date.now()
 
   const profile = profiles.find((p) => p.id === currentId)
@@ -279,6 +314,38 @@ export function ProfilePage() {
           >
             내 기록 초기화
           </button>
+        )}
+      </div>
+
+      {/* Data backup */}
+      <div className="card backup-card">
+        <div className="card-head">
+          <span>데이터 백업</span>
+        </div>
+        <p className="empty-msg sm">
+          모든 프로필·기록·설정을 JSON 파일로 저장하거나 복원해요. 가져오기는 현재 데이터를 덮어씁니다.
+        </p>
+        <div className="add-profile">
+          <button className="btn ghost" onClick={handleExport}>
+            데이터 내보내기(.json)
+          </button>
+          <button className="btn ghost" onClick={() => fileInput.current?.click()}>
+            데이터 가져오기
+          </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept=".json,application/json"
+            hidden
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (f) handleImportFile(f)
+              e.target.value = ''
+            }}
+          />
+        </div>
+        {backupMsg && (
+          <p className={`empty-msg sm ${backupMsg.ok ? '' : 'danger'}`}>{backupMsg.text}</p>
         )}
       </div>
     </div>
