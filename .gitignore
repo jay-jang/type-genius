@@ -10,5 +10,8 @@ npm-debug.log*
 # runtime tunnel URL (ephemeral)
 .tunnel-url
 
+# server-side rankings DB (runtime user data; server.mjs creates it)
+server-data/
+
 # local verification scripts (not shipped)
 tg-*.mjs

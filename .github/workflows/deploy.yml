@@ -1,7 +1,8 @@
 name: Deploy to GitHub Pages
 
-# Optional durable hosting. Enable once at: Settings → Pages → Source: "GitHub Actions".
-# (For a private repo this requires GitHub Pro/Team; the published site is public.)
+# Durable hosting at https://jay-jang.github.io/type-genius/.
+# Self-enabling: configure-pages uses `enablement: true`, so no manual
+# Settings → Pages step is needed (repo is public, so Pages is free).
 
 on:
   push:
@@ -35,6 +36,8 @@ jobs:
         env:
           BASE_PATH: /type-genius/
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
