@@ -19,7 +19,7 @@ const SPACE_COUNT: Record<PracticeMode, number> = {
 }
 
 export function HomePage() {
-  const { space, startRandom, startMixed, openLibrary, startCustom } = useNav()
+  const { space, startRandom, startMixed, openLibrary, startCustom, goArcade } = useNav()
   const sessions = useAppStore((s) => s.sessions)
   const currentId = useAppStore((s) => s.currentProfileId)
   const [selected, setSelected] = useState<PracticeMode>(space)
@@ -87,6 +87,9 @@ export function HomePage() {
         </button>
         <button className="btn lg" onClick={() => setCustomOpen(true)}>
           내 글 붙여넣기
+        </button>
+        <button className="btn lg" onClick={goArcade}>
+          🕹 산성비 게임
         </button>
       </div>
 

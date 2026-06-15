@@ -11,6 +11,7 @@ import { LibraryPage } from './pages/LibraryPage'
 import { ResultsPage } from './pages/ResultsPage'
 import { RankingsPage } from './pages/RankingsPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { ArcadePage } from './pages/ArcadePage'
 
 function Screens() {
   const { screen } = useNav()
@@ -25,6 +26,8 @@ function Screens() {
       return <RankingsPage />
     case 'profile':
       return <ProfilePage />
+    case 'arcade':
+      return <ArcadePage />
     case 'practice':
     default:
       return <PracticePage />

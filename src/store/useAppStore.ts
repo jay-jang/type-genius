@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Profile, SessionResult, Settings } from '../types'
+import type { Language, Profile, SessionResult, Settings } from '../types'
 
 const uid = (): string =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -28,10 +28,13 @@ interface AppState {
   currentProfileId: string | null
   sessions: SessionResult[]
   settings: Settings
+  /** Best "산성비" arcade score, keyed by `${profileId}:${language}`. */
+  arcadeBest: Record<string, number>
   hydrated: boolean
   typingActive: boolean
 
   setTyping: (active: boolean) => void
+  recordArcade: (language: Language, score: number) => number
   ensureDefaultProfile: () => void
   addProfile: (name: string) => Profile
   selectProfile: (id: string) => void
@@ -68,10 +71,20 @@ export const useAppStore = create<AppState>()(
       currentProfileId: null,
       sessions: [],
       settings: DEFAULT_SETTINGS,
+      arcadeBest: {},
       hydrated: false,
       typingActive: false,
 
       setTyping: (active) => set({ typingActive: active }),
+
+      recordArcade: (language, score) => {
+        const pid = get().currentProfileId
+        if (!pid) return score
+        const key = `${pid}:${language}`
+        const best = Math.max(get().arcadeBest[key] ?? 0, score)
+        set((s) => ({ arcadeBest: { ...s.arcadeBest, [key]: best } }))
+        return best
+      },
 
       ensureDefaultProfile: () => {
         const { profiles } = get()
@@ -183,6 +196,7 @@ export const useAppStore = create<AppState>()(
         currentProfileId: s.currentProfileId,
         sessions: s.sessions,
         settings: s.settings,
+        arcadeBest: s.arcadeBest,
       }),
       // Deep-merge settings so newly added keys (e.g. theme) get their defaults.
       merge: (persisted, current) => {

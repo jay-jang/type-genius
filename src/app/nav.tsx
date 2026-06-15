@@ -6,7 +6,7 @@ import { randomWords, randomWordStream } from '../data/words'
 import { hangulRatio } from '../lib/hangul'
 import { useAppStore } from '../store/useAppStore'
 
-export type Screen = 'home' | 'practice' | 'library' | 'results' | 'rankings' | 'profile'
+export type Screen = 'home' | 'practice' | 'library' | 'results' | 'rankings' | 'profile' | 'arcade'
 
 export type TestKind = 'passage' | 'time' | 'words'
 
@@ -72,6 +72,7 @@ interface NavValue {
   openLibrary: (space?: PracticeMode) => void
   goRankings: () => void
   goProfile: () => void
+  goArcade: () => void
   setConfig: (partial: Partial<TestConfig>) => void
   reroll: () => void
   startTest: (partial: Partial<TestConfig>) => void
@@ -197,6 +198,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
   }, [])
   const goRankings = useCallback(() => setScreen('rankings'), [])
   const goProfile = useCallback(() => setScreen('profile'), [])
+  const goArcade = useCallback(() => setScreen('arcade'), [])
 
   const startPassage = useCallback(
     (id: string, space?: PracticeMode) => {
@@ -299,12 +301,12 @@ export function NavProvider({ children }: { children: ReactNode }) {
   const value = useMemo<NavValue>(
     () => ({
       screen, space: config.mode, config, queue, index, drill, custom, wordRun, runId, lastResult,
-      goHome, openLibrary, goRankings, goProfile, setConfig, reroll, startTest,
+      goHome, openLibrary, goRankings, goProfile, goArcade, setConfig, reroll, startTest,
       startPassage, startRandom, startMixed, retry, next, startDrill, startCustom, finishPractice,
     }),
     [
       screen, config, queue, index, drill, custom, wordRun, runId, lastResult,
-      goHome, openLibrary, goRankings, goProfile, setConfig, reroll, startTest,
+      goHome, openLibrary, goRankings, goProfile, goArcade, setConfig, reroll, startTest,
       startPassage, startRandom, startMixed, retry, next, startDrill, startCustom, finishPractice,
     ],
   )

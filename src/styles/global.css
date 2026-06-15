@@ -1911,3 +1911,128 @@ kbd {
   --main-rgb: 189, 147, 249;
 }
 
+
+/* =========================================================================
+   산성비 (Acid Rain) arcade mode
+   ========================================================================= */
+.arcade-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.arcade-hud {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.arcade-hud b {
+  color: var(--text);
+  font-weight: 800;
+}
+.arcade-lives {
+  color: var(--error);
+  letter-spacing: 0.1em;
+}
+.arcade-lives .dim {
+  color: var(--sub-alt);
+}
+.arcade-best {
+  margin-left: auto;
+  color: var(--main);
+}
+.arcade-field {
+  position: relative;
+  flex: 1;
+  min-height: 62vh;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--round);
+  background:
+    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--main) 8%, transparent), transparent 60%),
+    var(--sub-alt);
+  cursor: text;
+}
+.arcade-word {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 0.25em 0.6em;
+  border-radius: var(--round);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: 1px solid var(--border);
+  color: var(--text);
+  will-change: top;
+}
+.arcade-word.on {
+  border-color: var(--main);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--main) 35%, transparent);
+  color: #fff;
+}
+.aw-typed {
+  color: var(--main);
+  font-weight: 800;
+}
+.arcade-input {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  color: transparent;
+  resize: none;
+  caret-color: transparent;
+}
+.arcade-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: blur(2px);
+}
+.arcade-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.arcade-desc,
+.arcade-final {
+  color: var(--sub);
+  line-height: 1.6;
+}
+.arcade-final {
+  font-size: 1.2rem;
+}
+.arcade-final b {
+  color: var(--main);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+.arcade-lang {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.arcade-hint {
+  text-align: center;
+  color: var(--sub);
+  font-size: 0.85rem;
+}
