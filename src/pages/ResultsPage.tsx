@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNav } from '../app/nav'
 import { useAppStore } from '../store/useAppStore'
 import { LineChart } from '../components/LineChart'
@@ -11,6 +12,21 @@ export function ResultsPage() {
   const { lastResult, retry, next, startDrill, goHome } = useNav()
   const sessions = useAppStore((s) => s.sessions)
   const currentId = useAppStore((s) => s.currentProfileId)
+
+  // Keep your hands on the keyboard: Enter → next text, Tab → retry.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        if ((document.activeElement as HTMLElement)?.tagName === 'BUTTON') return
+        next()
+      } else if (e.key === 'Tab') {
+        e.preventDefault()
+        retry()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [next, retry])
 
   if (!lastResult) {
     return (
@@ -42,6 +58,18 @@ export function ResultsPage() {
   const scoreSeries = meta.mode === 'ko' ? result.samples.map((s) => s.cpm ?? s.wpm) : result.samples.map((s) => s.wpm)
   const rawSeries = meta.mode === 'ko' ? result.samples.map((s) => s.rawCpm ?? s.raw) : result.samples.map((s) => s.raw)
 
+  // One actionable line so the numbers translate into a next move.
+  const insight = ((): string => {
+    if (meta.isDrill) return '틀렸던 부분을 다시 쳐봤어요. 본 연습으로 돌아가 볼까요?'
+    if (isRecord) return '🎉 신기록이에요! 이 페이스를 한 번 더 유지해 보세요.'
+    if (isFirst) return '첫 기록을 세웠어요 — 이제 비교할 기준점이 생겼어요.'
+    if (result.accuracy < 95) return `정확도 ${Math.round(result.accuracy)}% · 조금만 더 정확하면 속도도 같이 올라가요.`
+    if (priorBest >= 0 && score <= priorBest && result.errorCount > 0)
+      return `오타 ${result.errorCount}개만 줄여도 최고 기록(${Math.round(priorBest)} ${unit})이 보여요.`
+    if (result.consistency < 70) return '속도 기복이 큰 편이에요 · 일정한 리듬으로 쳐보세요.'
+    return '좋은 흐름이에요 — 다음 글로 이어가 볼까요?'
+  })()
+
   const typeLabel =
     meta.genre === 'drill'
       ? `${MODE_LABELS[meta.mode]} · 오답`
@@ -61,6 +89,8 @@ export function ResultsPage() {
         {isFirst && <span className="result-badge first">첫 기록</span>}
         {perfect && !meta.isDrill && <span className="result-badge perfect">무결점</span>}
       </div>
+
+      <p className="res-insight">{insight}</p>
 
       <div className="res-top">
         <div className="res-headline">
@@ -125,6 +155,7 @@ export function ResultsPage() {
           <IconRedo size={16} /> 다시
         </button>
       </div>
+      <p className="res-kbd-hint"><kbd>Enter</kbd> 다음 글 · <kbd>Tab</kbd> 다시</p>
     </div>
   )
 }

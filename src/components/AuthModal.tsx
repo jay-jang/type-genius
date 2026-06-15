@@ -6,10 +6,12 @@ import { useAppStore } from '../store/useAppStore'
 export function AuthModal({ onClose }: { onClose: () => void }) {
   const register = useAppStore((s) => s.register)
   const login = useAppStore((s) => s.login)
+  const hasLocalData = useAppStore((s) => s.sessions.length > 0)
 
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [merge, setMerge] = useState(true) // login: keep this device's records by default
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -17,7 +19,10 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
     if (busy || !username.trim() || !password) return
     setBusy(true)
     setError(null)
-    const res = mode === 'login' ? await login(username.trim(), password) : await register(username.trim(), password)
+    const res =
+      mode === 'login'
+        ? await login(username.trim(), password, merge)
+        : await register(username.trim(), password)
     setBusy(false)
     if (res.ok) onClose()
     else setError(res.error ?? '오류가 발생했어요.')
@@ -65,6 +70,19 @@ export function AuthModal({ onClose }: { onClose: () => void }) {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
           />
+          {mode === 'login' && hasLocalData && (
+            <div className="auth-merge">
+              <p className="auth-merge-q">이 기기에 쌓인 기록이 있어요. 어떻게 할까요?</p>
+              <label className="auth-merge-opt">
+                <input type="radio" name="merge" checked={merge} onChange={() => setMerge(true)} />
+                <span>이 기기 기록을 <b>계정과 합치기</b> (추천)</span>
+              </label>
+              <label className="auth-merge-opt">
+                <input type="radio" name="merge" checked={!merge} onChange={() => setMerge(false)} />
+                <span>계정 기록으로 <b>교체</b> (이 기기 기록은 사라져요)</span>
+              </label>
+            </div>
+          )}
           {error && <p className="auth-error">{error}</p>}
           <div className="modal-actions">
             <button type="button" className="btn ghost" onClick={onClose}>취소</button>

@@ -55,7 +55,8 @@ interface AppState {
   setTyping: (active: boolean) => void
   recordArcade: (language: Language, score: number) => number
   register: (username: string, password: string) => Promise<AuthResult>
-  login: (username: string, password: string) => Promise<AuthResult>
+  /** `merge` keeps this device's records and combines them with the account's. */
+  login: (username: string, password: string, merge?: boolean) => Promise<AuthResult>
   logout: () => void
   syncUp: () => Promise<void>
   refreshFromServer: () => Promise<void>
@@ -123,6 +124,25 @@ function dataFrom(s: AppState): SyncData {
   return { profiles: s.profiles, sessions: s.sessions, arcadeBest: s.arcadeBest, streak: s.streak }
 }
 
+/** Union this device's records with an account's, so nothing is lost on login. */
+function mergeData(local: SyncData, server: Partial<SyncData>): SyncData {
+  // Sessions: dedupe by id (server first, local wins on collision), keep newest 1000.
+  const byId = new Map<string, SessionResult>()
+  for (const s of [...(server.sessions ?? []), ...local.sessions]) byId.set(s.id, s)
+  const sessions = [...byId.values()].sort((a, b) => a.timestamp - b.timestamp).slice(-1000)
+  // Profiles: union by id, local entry wins (keeps the local name/color).
+  const profById = new Map<string, Profile>()
+  for (const p of [...(server.profiles ?? []), ...local.profiles]) profById.set(p.id, p)
+  // Arcade bests: per-key max.
+  const arcadeBest: Record<string, number> = { ...(server.arcadeBest ?? {}) }
+  for (const [k, v] of Object.entries(local.arcadeBest)) arcadeBest[k] = Math.max(arcadeBest[k] ?? 0, v)
+  // Streak: best of both; the more recent lastDate drives current days.
+  const ss = server.streak ?? EMPTY_STREAK
+  const newer = local.streak.lastDate >= ss.lastDate ? local.streak : ss
+  const streak: Streak = { best: Math.max(local.streak.best, ss.best), days: newer.days, lastDate: newer.lastDate }
+  return { profiles: [...profById.values()], sessions, arcadeBest, streak }
+}
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => {
@@ -186,7 +206,7 @@ export const useAppStore = create<AppState>()(
         }
       },
 
-      login: async (username, password) => {
+      login: async (username, password, merge = false) => {
         try {
           const res = await fetch('/api/auth/login', {
             method: 'POST',
@@ -196,7 +216,18 @@ export const useAppStore = create<AppState>()(
           const json = await res.json().catch(() => ({}))
           if (!res.ok) return { ok: false, error: json.error || '로그인에 실패했어요.' }
           set({ auth: { token: json.token, user: json.user } })
-          applyData(json.data)
+          if (merge) {
+            // Keep this device's records and combine them with the account's.
+            const merged = mergeData(dataFrom(get()), (json.data ?? {}) as Partial<SyncData>)
+            const cur = get().currentProfileId
+            const currentProfileId =
+              cur && merged.profiles.some((p) => p.id === cur) ? cur : (merged.profiles[0]?.id ?? null)
+            set({ ...merged, currentProfileId })
+            get().ensureDefaultProfile()
+            void get().syncUp() // push the merged record back up
+          } else {
+            applyData(json.data) // replace local with the account's record
+          }
           return { ok: true }
         } catch {
           return { ok: false, error: '서버에 연결할 수 없어요.' }

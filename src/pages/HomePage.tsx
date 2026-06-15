@@ -23,6 +23,7 @@ export function HomePage() {
   const sessions = useAppStore((s) => s.sessions)
   const currentId = useAppStore((s) => s.currentProfileId)
   const streak = useAppStore((s) => s.streak)
+  const auth = useAppStore((s) => s.auth)
   const [selected, setSelected] = useState<PracticeMode>(space)
   const [customOpen, setCustomOpen] = useState(false)
   const [customText, setCustomText] = useState('')
@@ -110,7 +111,17 @@ export function HomePage() {
           )}
         </div>
       ) : (
-        <div className="home-hint">첫 글을 입력하면 기록과 랭킹이 쌓여요</div>
+        <div className="home-hint">
+          공간(언어)을 고르고 <b>바로 시작</b> — 처음이라면 이걸로 충분해요.
+          <br />첫 글을 끝내면 기록·랭킹·업적이 쌓이기 시작합니다.
+        </div>
+      )}
+
+      <p className="home-shortcut">
+        <kbd>←</kbd> <kbd>→</kbd> 언어 선택 · <kbd>Enter</kbd> 바로 시작
+      </p>
+      {!auth && summary.totalSessions > 0 && (
+        <p className="home-shortcut">기록을 안전하게 보관하려면 우측 상단에서 <b>로그인</b> 하세요.</p>
       )}
 
       {customOpen && (

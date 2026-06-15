@@ -32,6 +32,8 @@ export function ArcadePage() {
 
   const [status, setStatus] = useState<'ready' | 'playing' | 'over'>('ready')
   const [language, setLanguage] = useState<Language>('ko')
+  const [paused, setPaused] = useState(false)
+  const pausedRef = useRef(false)
 
   // A frame counter forces re-render; all live game state lives in refs so the
   // rAF loop and input handler never read stale values.
@@ -103,6 +105,7 @@ export function ArcadePage() {
 
   const loop = useCallback(
     (now: number) => {
+      if (pausedRef.current) return // stopped; resume() restarts the loop
       const last = lastTickRef.current || now
       const dt = Math.min(0.05, (now - last) / 1000) // clamp tab-switch gaps
       lastTickRef.current = now
@@ -166,10 +169,28 @@ export function ArcadePage() {
     spawnAccRef.current = 0
     lastTickRef.current = 0
     gameStartRef.current = Date.now()
+    pausedRef.current = false
+    setPaused(false)
     if (taRef.current) taRef.current.value = ''
     sound.resume()
     setStatus('playing')
   }, [])
+
+  const pause = useCallback(() => {
+    if (pausedRef.current) return
+    pausedRef.current = true
+    setPaused(true)
+    cancelAnimationFrame(rafRef.current)
+  }, [])
+
+  const resume = useCallback(() => {
+    if (!pausedRef.current) return
+    pausedRef.current = false
+    setPaused(false)
+    lastTickRef.current = 0
+    rafRef.current = requestAnimationFrame(loop)
+    taRef.current?.focus()
+  }, [loop])
 
   // Drive the loop while playing; clean up on stop/unmount.
   useEffect(() => {
@@ -184,9 +205,38 @@ export function ArcadePage() {
     }
   }, [status, loop, spawn])
 
+  // Esc: while playing → toggle pause; otherwise → leave to home.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      e.preventDefault()
+      if (status === 'playing') {
+        if (pausedRef.current) resume()
+        else pause()
+      } else {
+        goHome()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [status, pause, resume, goHome])
+
+  // Losing focus / hiding the tab auto-pauses so you don't helplessly lose lives.
+  useEffect(() => {
+    if (status !== 'playing') return
+    const onAway = () => pause()
+    const onVis = () => { if (document.hidden) pause() }
+    window.addEventListener('blur', onAway)
+    document.addEventListener('visibilitychange', onVis)
+    return () => {
+      window.removeEventListener('blur', onAway)
+      document.removeEventListener('visibilitychange', onVis)
+    }
+  }, [status, pause])
+
   const onInput = useCallback(
     (e: React.FormEvent<HTMLTextAreaElement>) => {
-      if (status !== 'playing') return
+      if (status !== 'playing' || pausedRef.current) return
       const ta = e.currentTarget
       const composing = (e.nativeEvent as InputEvent).isComposing
       let buf = ta.value
@@ -247,6 +297,12 @@ export function ArcadePage() {
 
   const lives = Math.max(0, livesRef.current)
   const f = finalRef.current
+  // When nothing is being typed, hint the word that will be auto-aimed next
+  // (the lowest = most urgent), so the reticle is never a surprise.
+  const nextId =
+    focusedRef.current == null && bufferRef.current.length === 0
+      ? wordsRef.current.reduce<DroppingWord | null>((lo, w) => (!lo || w.y > lo.y ? w : lo), null)?.id ?? null
+      : null
 
   return (
     <div className="screen arcade-screen">
@@ -259,6 +315,9 @@ export function ArcadePage() {
         <span>콤보 <b>{comboRef.current}</b></span>
         <span>Lv <b>{levelRef.current + 1}</b></span>
         <span className="arcade-best">최고 {best}</span>
+        {status === 'playing' && !paused && (
+          <button className="btn sm arcade-pause-btn" onClick={pause} title="일시정지 (Esc)">⏸ 일시정지</button>
+        )}
       </div>
 
       <div className="arcade-field" ref={fieldRef} onClick={() => taRef.current?.focus()}>
@@ -268,14 +327,26 @@ export function ArcadePage() {
           return (
             <div
               key={w.id}
-              className={`arcade-word ${focused ? 'on' : ''}`}
+              className={`arcade-word ${focused ? 'on' : ''} ${w.id === nextId ? 'next' : ''}`}
               style={{ left: `${w.x}%`, top: `${w.y}%` }}
             >
+              {focused && <span className="aw-reticle" aria-hidden>◎</span>}
               {typed > 0 && <span className="aw-typed">{w.text.slice(0, typed)}</span>}
               {w.text.slice(typed)}
             </div>
           )
         })}
+
+        {status === 'playing' && paused && (
+          <div className="arcade-overlay">
+            <h2 className="arcade-title">⏸ 일시정지</h2>
+            <p className="arcade-desc">Esc 를 다시 누르면 이어집니다.</p>
+            <div className="arcade-lang">
+              <button className="btn primary lg" onClick={resume}>▶ 이어하기</button>
+              <button className="btn lg" onClick={goHome}>홈으로</button>
+            </div>
+          </div>
+        )}
 
         {status !== 'playing' && (
           <div className="arcade-overlay">
@@ -321,7 +392,8 @@ export function ArcadePage() {
             autoFocus
             onInput={onInput}
             onBlur={() => {
-              if (status === 'playing') window.setTimeout(() => taRef.current?.focus(), 0)
+              // Keep focus while actively playing, but not while paused.
+              if (status === 'playing' && !pausedRef.current) window.setTimeout(() => taRef.current?.focus(), 0)
             }}
             defaultValue=""
             placeholder="여기에 입력…"
@@ -334,7 +406,10 @@ export function ArcadePage() {
         )}
       </div>
 
-      <p className="arcade-hint">단어를 그대로 입력하면 격파됩니다 · 콤보 5마다 점수 배율 ↑</p>
+      <p className="arcade-hint">
+        단어를 그대로 입력하면 격파 · <kbd>Space</kbd>/<kbd>Backspace</kbd> 로 입력 지우기 ·{' '}
+        <kbd>Esc</kbd> 일시정지 · 콤보 5마다 점수 배율 ↑
+      </p>
     </div>
   )
 }

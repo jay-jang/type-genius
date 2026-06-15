@@ -45,6 +45,7 @@ function Shell() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
+      if (screen === 'arcade') return // arcade owns Esc (pause)
       if (screen === 'practice') openLibrary()
       else goHome()
     }

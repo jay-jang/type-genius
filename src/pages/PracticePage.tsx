@@ -4,7 +4,7 @@ import { ConfigBar } from '../components/ConfigBar'
 import { TypingArea, type GhostRacer } from '../components/TypingArea'
 import { useAppStore } from '../store/useAppStore'
 import { pickGhostPace, ghostTotalUnits, ghostUnit } from '../lib/ghost'
-import { scoreUnit } from '../lib/stats'
+import { scoreUnit, isRanked } from '../lib/stats'
 
 export function PracticePage() {
   const { config, queue, index, drill, custom, wordRun, race, runId, reroll, finishPractice } = useNav()
@@ -95,11 +95,12 @@ export function PracticePage() {
   if (race && !drill && !custom && !wordRun) {
     const pace = pickGhostPace(sessions, currentId, meta.mode)
     const unit = ghostUnit(meta.mode)
+    const hasHistory = sessions.some((s) => s.profileId === currentId && s.mode === meta.mode && isRanked(s))
     ghost = {
       pace,
       unit,
       totalUnits: ghostTotalUnits(target, unit),
-      paceLabel: `${Math.round(pace)} ${scoreUnit(meta.mode)}`,
+      paceLabel: `${hasHistory ? '내 최고' : '기본 페이스'} ${Math.round(pace)} ${scoreUnit(meta.mode)}`,
     }
   }
 

@@ -36,22 +36,22 @@ export function TopBar() {
 
       <nav className="topnav">
         <button className={`navbtn ${screen === 'home' ? 'on' : ''}`} onClick={goHome} title="홈" aria-label="홈">
-          <IconHome />
+          <IconHome /><span className="navbtn-label">홈</span>
         </button>
         <button className={`navbtn ${screen === 'library' ? 'on' : ''}`} onClick={() => openLibrary()} title="글 고르기" aria-label="글 고르기">
-          <IconBook />
+          <IconBook /><span className="navbtn-label">글</span>
         </button>
         <button className={`navbtn ${screen === 'arcade' ? 'on' : ''}`} onClick={goArcade} title="산성비 게임" aria-label="산성비 게임">
-          <IconTarget />
+          <IconTarget /><span className="navbtn-label">게임</span>
         </button>
         <button className={`navbtn ${screen === 'activity' ? 'on' : ''}`} onClick={goActivity} title="활동 기록" aria-label="활동 기록">
-          <IconChart />
+          <IconChart /><span className="navbtn-label">활동</span>
         </button>
         <button className={`navbtn ${screen === 'rankings' ? 'on' : ''}`} onClick={goRankings} title="랭킹" aria-label="랭킹">
-          <IconCrown />
+          <IconCrown /><span className="navbtn-label">랭킹</span>
         </button>
         <button className={`navbtn ${screen === 'profile' ? 'on' : ''}`} onClick={goProfile} title="통계 / 설정" aria-label="통계 / 설정">
-          <IconUser />
+          <IconUser /><span className="navbtn-label">통계</span>
         </button>
       </nav>
 

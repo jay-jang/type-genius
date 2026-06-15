@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useNav } from '../app/nav'
 import { useAppStore } from '../store/useAppStore'
 import { sessionsForProfile } from '../lib/stats'
 import { summarizeActivity, classifyGame } from '../lib/activity'
@@ -6,6 +7,7 @@ import { formatTimeAgo, formatDuration } from '../lib/metrics'
 
 // Dedicated "활동 기록" screen: what games were played and how often.
 export function ActivityPage() {
+  const { goHome, goArcade } = useNav()
   const sessions = useAppStore((s) => s.sessions)
   const currentId = useAppStore((s) => s.currentProfileId)
   const streak = useAppStore((s) => s.streak)
@@ -52,6 +54,10 @@ export function ActivityPage() {
       {activity.totalPlays === 0 ? (
         <div className="card">
           <p className="empty-msg">아직 플레이 기록이 없어요. 한 판 해볼까요?</p>
+          <div className="arcade-lang">
+            <button className="btn primary" onClick={goHome}>▶ 연습 시작</button>
+            <button className="btn" onClick={goArcade}>🕹 산성비 한 판</button>
+          </div>
         </div>
       ) : (
         <>

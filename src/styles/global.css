@@ -2266,3 +2266,83 @@ kbd {
 .acal-day.on {
   background: var(--main);
 }
+
+/* === UX polish pass (review-driven) ====================================== */
+
+/* Login: keep-or-replace choice */
+.auth-merge {
+  margin-top: 0.7rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--round);
+  background: var(--bg);
+}
+.auth-merge-q {
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+.auth-merge-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--sub);
+  padding: 0.2rem 0;
+  cursor: pointer;
+}
+.auth-merge-opt b { color: var(--text); }
+
+/* Nav text labels (hidden on narrow screens) */
+.navbtn {
+  gap: 0.4rem;
+}
+.navbtn-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+@media (max-width: 720px) {
+  .navbtn-label { display: none; }
+}
+
+/* Home onboarding shortcut hint */
+.home-shortcut {
+  text-align: center;
+  color: var(--sub);
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+.home-shortcut b { color: var(--text); }
+
+/* Results: insight + keyboard hint */
+.res-insight {
+  text-align: center;
+  color: var(--text);
+  background: color-mix(in srgb, var(--main) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--main) 30%, transparent);
+  border-radius: var(--round);
+  padding: 0.6em 0.9em;
+  font-size: 0.95rem;
+  margin: 0.2rem 0 0.4rem;
+}
+.res-kbd-hint {
+  text-align: center;
+  color: var(--sub);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+/* Arcade: default-target hint, reticle, pause button */
+.arcade-word.next {
+  border-color: color-mix(in srgb, var(--main) 45%, transparent);
+  border-style: dashed;
+}
+.aw-reticle {
+  margin-right: 0.3em;
+  color: var(--main);
+  opacity: 0.9;
+}
+.arcade-pause-btn {
+  margin-left: 0.4rem;
+}
