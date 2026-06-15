@@ -65,6 +65,8 @@ interface NavValue {
   drill: Drill | null
   custom: CustomText | null
   wordRun: WordRun | null
+  /** When true, the current passage run shows a 고스트 레이싱 pace-setter. */
+  race: boolean
   runId: number
   lastResult: LastResult | null
 
@@ -78,6 +80,7 @@ interface NavValue {
   startTest: (partial: Partial<TestConfig>) => void
   startPassage: (id: string, space?: PracticeMode) => void
   startRandom: (space: PracticeMode) => void
+  startRace: (space: PracticeMode) => void
   startMixed: () => void
   retry: () => void
   next: () => void
@@ -134,6 +137,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
   const [drill, setDrill] = useState<Drill | null>(null)
   const [custom, setCustom] = useState<CustomText | null>(null)
   const [wordRun, setWordRun] = useState<WordRun | null>(null)
+  const [race, setRace] = useState(false)
   const [runId, setRunId] = useState(0)
   const [lastResult, setLastResult] = useState<LastResult | null>(null)
 
@@ -145,6 +149,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
         setWordRun(buildWordRun(cfg.mode, cfg.testKind, cfg.limit))
         setDrill(null)
         setCustom(null)
+        setRace(false)
         bump()
         setScreen('practice')
         return
@@ -208,14 +213,31 @@ export function NavProvider({ children }: { children: ReactNode }) {
       setDrill(null)
       setCustom(null)
       setWordRun(null)
+      setRace(false)
       bump()
       setScreen('practice')
     },
     [bump],
   )
 
-  const startRandom = useCallback((space: PracticeMode) => setConfig({ mode: space, testKind: 'passage' }), [setConfig])
-  const startMixed = useCallback(() => setConfig({ mode: 'mixed', testKind: 'passage' }), [setConfig])
+  const startRandom = useCallback(
+    (space: PracticeMode) => {
+      setRace(false)
+      setConfig({ mode: space, testKind: 'passage' })
+    },
+    [setConfig],
+  )
+  const startRace = useCallback(
+    (space: PracticeMode) => {
+      setRace(true)
+      setConfig({ mode: space, testKind: 'passage' })
+    },
+    [setConfig],
+  )
+  const startMixed = useCallback(() => {
+    setRace(false)
+    setConfig({ mode: 'mixed', testKind: 'passage' })
+  }, [setConfig])
 
   const retry = useCallback(() => {
     bump()
@@ -247,6 +269,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
     (d: Drill) => {
       setCustom(null)
       setWordRun(null)
+      setRace(false)
       setDrill(d)
       bump()
       setScreen('practice')
@@ -261,6 +284,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
       const language: Language = hangulRatio(trimmed) >= 0.3 ? 'ko' : 'en'
       setDrill(null)
       setWordRun(null)
+      setRace(false)
       setCustom({ text: trimmed, language })
       bump()
       setScreen('practice')
@@ -300,14 +324,14 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<NavValue>(
     () => ({
-      screen, space: config.mode, config, queue, index, drill, custom, wordRun, runId, lastResult,
+      screen, space: config.mode, config, queue, index, drill, custom, wordRun, race, runId, lastResult,
       goHome, openLibrary, goRankings, goProfile, goArcade, setConfig, reroll, startTest,
-      startPassage, startRandom, startMixed, retry, next, startDrill, startCustom, finishPractice,
+      startPassage, startRandom, startRace, startMixed, retry, next, startDrill, startCustom, finishPractice,
     }),
     [
-      screen, config, queue, index, drill, custom, wordRun, runId, lastResult,
+      screen, config, queue, index, drill, custom, wordRun, race, runId, lastResult,
       goHome, openLibrary, goRankings, goProfile, goArcade, setConfig, reroll, startTest,
-      startPassage, startRandom, startMixed, retry, next, startDrill, startCustom, finishPractice,
+      startPassage, startRandom, startRace, startMixed, retry, next, startDrill, startCustom, finishPractice,
     ],
   )
 

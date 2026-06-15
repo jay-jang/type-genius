@@ -5,7 +5,17 @@ import { useTypingEngine, statusesFor, type EngineResult } from '../hooks/useTyp
 import { primarySpeed, speedUnit } from '../lib/metrics'
 import { spawnBurst, spawnConfetti, shake, flash } from '../lib/effects'
 import { sound } from '../lib/sound'
+import { ghostProgress, type GhostUnit } from '../lib/ghost'
+import { RaceTrack } from './RaceTrack'
 import { useAppStore } from '../store/useAppStore'
+
+/** A constant-pace ghost racer to render above the typing surface. */
+export interface GhostRacer {
+  pace: number
+  totalUnits: number
+  unit: GhostUnit
+  paceLabel: string
+}
 
 interface TypingAreaProps {
   target: string
@@ -14,10 +24,11 @@ interface TypingAreaProps {
   subtitle?: string
   badge?: string
   timeLimitMs?: number
+  ghost?: GhostRacer
   onFinish: (result: EngineResult) => void
 }
 
-export function TypingArea({ target, language, title, subtitle, badge, timeLimitMs, onFinish }: TypingAreaProps) {
+export function TypingArea({ target, language, title, subtitle, badge, timeLimitMs, ghost, onFinish }: TypingAreaProps) {
   const settings = useAppStore((s) => s.settings)
   const setTyping = useAppStore((s) => s.setTyping)
   const prefersReducedMotion =
@@ -195,6 +206,14 @@ export function TypingArea({ target, language, title, subtitle, badge, timeLimit
 
   return (
     <div className="typing-stage" ref={stageRef}>
+      {ghost && !engine.finished && (
+        <RaceTrack
+          you={stats.progress}
+          ghost={ghostProgress(ghost.pace, stats.elapsedMs, ghost.totalUnits, ghost.unit)}
+          paceLabel={ghost.paceLabel}
+        />
+      )}
+
       {settings.showLiveStats && (
         <div className="test-live">
           <span className="tl-speed">

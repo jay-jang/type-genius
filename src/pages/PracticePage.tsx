@@ -1,10 +1,15 @@
 import { useNav, type PracticeMeta } from '../app/nav'
 import { getPassage, GENRE_LABELS, DIFFICULTY_LABELS } from '../data'
 import { ConfigBar } from '../components/ConfigBar'
-import { TypingArea } from '../components/TypingArea'
+import { TypingArea, type GhostRacer } from '../components/TypingArea'
+import { useAppStore } from '../store/useAppStore'
+import { pickGhostPace, ghostTotalUnits, ghostUnit } from '../lib/ghost'
+import { scoreUnit } from '../lib/stats'
 
 export function PracticePage() {
-  const { config, queue, index, drill, custom, wordRun, runId, reroll, finishPractice } = useNav()
+  const { config, queue, index, drill, custom, wordRun, race, runId, reroll, finishPractice } = useNav()
+  const sessions = useAppStore((s) => s.sessions)
+  const currentId = useAppStore((s) => s.currentProfileId)
 
   let target: string
   let meta: PracticeMeta
@@ -85,6 +90,19 @@ export function PracticePage() {
     }
   }
 
+  // 고스트 레이싱: only for ranked passage runs, paced by your best prior score.
+  let ghost: GhostRacer | undefined
+  if (race && !drill && !custom && !wordRun) {
+    const pace = pickGhostPace(sessions, currentId, meta.mode)
+    const unit = ghostUnit(meta.mode)
+    ghost = {
+      pace,
+      unit,
+      totalUnits: ghostTotalUnits(target, unit),
+      paceLabel: `${Math.round(pace)} ${scoreUnit(meta.mode)}`,
+    }
+  }
+
   return (
     <div className="screen test-screen">
       <ConfigBar />
@@ -96,6 +114,7 @@ export function PracticePage() {
         subtitle={subtitle}
         badge={badge}
         timeLimitMs={timeLimitMs}
+        ghost={ghost}
         onFinish={(r) => finishPractice(r, meta)}
       />
     </div>

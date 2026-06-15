@@ -386,6 +386,66 @@ kbd {
   position: relative;
   width: 100%;
 }
+
+/* 고스트 레이싱 track */
+.race-track {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+}
+.race-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  color: var(--sub);
+}
+.race-pace {
+  font-weight: 700;
+}
+.race-gap.ahead {
+  color: var(--main);
+}
+.race-gap.behind {
+  color: var(--error);
+}
+.race-lane {
+  position: relative;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: var(--sub-alt);
+  overflow: hidden;
+}
+.race-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  transition: width 0.15s linear;
+}
+.race-fill.you {
+  background: color-mix(in srgb, var(--main) 30%, transparent);
+}
+.race-fill.ghost {
+  background: color-mix(in srgb, var(--sub) 30%, transparent);
+}
+.race-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.85rem;
+  line-height: 1;
+  font-weight: 700;
+  transition: left 0.15s linear;
+  white-space: nowrap;
+}
+.race-marker.you {
+  color: var(--main);
+}
+.race-marker.ghost {
+  color: var(--text);
+}
 .test-live {
   display: flex;
   align-items: center;
