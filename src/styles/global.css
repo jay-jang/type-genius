@@ -880,6 +880,44 @@ kbd {
   align-self: flex-start;
 }
 
+/* ---------------------------------------------------- achievements --- */
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.7rem;
+}
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+  padding: 0.8rem 0.6rem;
+  background: var(--sub-alt);
+  border-radius: var(--round);
+  border: 1px solid transparent;
+}
+.badge.on {
+  border-color: var(--main);
+}
+.badge.off {
+  opacity: 0.38;
+  filter: grayscale(1);
+}
+.badge-icon {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+.badge-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.badge-desc {
+  font-size: 0.7rem;
+  color: var(--sub);
+}
+
 /* ------------------------------------------------------------- rankings --- */
 .rank-note {
   color: var(--sub);

@@ -22,6 +22,7 @@ export function HomePage() {
   const { space, startRandom, startRace, startMixed, openLibrary, startCustom, goArcade } = useNav()
   const sessions = useAppStore((s) => s.sessions)
   const currentId = useAppStore((s) => s.currentProfileId)
+  const streak = useAppStore((s) => s.streak)
   const [selected, setSelected] = useState<PracticeMode>(space)
   const [customOpen, setCustomOpen] = useState(false)
   const [customText, setCustomText] = useState('')
@@ -104,6 +105,9 @@ export function HomePage() {
             </>
           )}
           Lv.<b>{summary.level}</b> · 연습 <b>{summary.totalSessions}</b>회
+          {streak.days > 0 && (
+            <> · 🔥 <b>{streak.days}</b>일 연속</>
+          )}
         </div>
       ) : (
         <div className="home-hint">첫 글을 입력하면 기록과 랭킹이 쌓여요</div>

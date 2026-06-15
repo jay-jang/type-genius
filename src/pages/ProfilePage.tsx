@@ -13,6 +13,7 @@ import {
   scoreUnit,
   MODE_LABELS,
 } from '../lib/stats'
+import { evaluateAchievements } from '../lib/achievements'
 import { formatDuration, formatTimeAgo } from '../lib/metrics'
 import { sound } from '../lib/sound'
 import { THEMES } from '../data/themes'
@@ -29,6 +30,7 @@ export function ProfilePage() {
   const currentId = useAppStore((s) => s.currentProfileId)
   const sessions = useAppStore((s) => s.sessions)
   const settings = useAppStore((s) => s.settings)
+  const streak = useAppStore((s) => s.streak)
   const addProfile = useAppStore((s) => s.addProfile)
   const selectProfile = useAppStore((s) => s.selectProfile)
   const renameProfile = useAppStore((s) => s.renameProfile)
@@ -81,6 +83,11 @@ export function ProfilePage() {
   const series = currentId ? improvementSeries(sessions, currentId) : []
   const recent = currentId ? recentSessions(sessions, currentId) : []
   const xpPct = Math.round((summary.xpInLevel / summary.xpForNextLevel) * 100)
+  const badges = useMemo(
+    () => evaluateAchievements({ sessions: mine, summary, streak }),
+    [mine, summary, streak],
+  )
+  const unlockedCount = badges.filter((b) => b.unlocked).length
 
   // The weakness card analyzes one concrete language. 복합(mixed) folds into Korean.
   const weakLang: Language = space === 'en' ? 'en' : 'ko'
@@ -126,6 +133,37 @@ export function ProfilePage() {
           <Mini label="평균 정확도" value={`${Math.round(summary.avgAccuracy)}%`} />
           <Mini label="누적 시간" value={summary.totalTimeMs ? formatDuration(summary.totalTimeMs) : '0초'} />
           <Mini label="누적 타수" value={summary.totalStrokes.toLocaleString()} />
+        </div>
+      </div>
+
+      {/* Streak */}
+      <div className="card streak-card">
+        <div className="card-head">
+          <span>🔥 데일리 스트릭</span>
+        </div>
+        <div className="ps-stats">
+          <Mini label="현재 연속" value={`${streak.days}일`} />
+          <Mini label="최고 연속" value={`${streak.best}일`} />
+        </div>
+      </div>
+
+      {/* Achievements */}
+      <div className="card">
+        <div className="card-head">
+          <span>🏆 업적 ({unlockedCount}/{badges.length})</span>
+        </div>
+        <div className="badge-grid">
+          {badges.map((b) => (
+            <div
+              key={b.id}
+              className={`badge ${b.unlocked ? 'on' : 'off'}`}
+              title={b.desc}
+            >
+              <span className="badge-icon">{b.icon}</span>
+              <span className="badge-label">{b.label}</span>
+              <span className="badge-desc">{b.desc}</span>
+            </div>
+          ))}
         </div>
       </div>
 

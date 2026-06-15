@@ -30,6 +30,8 @@ interface AppState {
   settings: Settings
   /** Best "산성비" arcade score, keyed by `${profileId}:${language}`. */
   arcadeBest: Record<string, number>
+  /** Daily-practice streak, advanced on every recorded session. */
+  streak: Streak
   hydrated: boolean
   typingActive: boolean
 
@@ -61,6 +63,30 @@ export interface BackupFile {
   }
 }
 
+/** Daily-practice streak. `lastDate` is a local 'YYYY-MM-DD' string. */
+export interface Streak {
+  lastDate: string
+  days: number
+  best: number
+}
+
+const EMPTY_STREAK: Streak = { lastDate: '', days: 0, best: 0 }
+
+/** Local calendar date as 'YYYY-MM-DD' for a given timestamp (default: now). */
+function localDateString(ts = Date.now()): string {
+  const d = new Date(ts)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/** Advance a streak given that a session was recorded "now". Pure. */
+function advanceStreak(prev: Streak): Streak {
+  const today = localDateString()
+  if (prev.lastDate === today) return prev
+  const yesterday = localDateString(Date.now() - 86_400_000)
+  const days = prev.lastDate === yesterday ? prev.days + 1 : 1
+  return { lastDate: today, days, best: Math.max(prev.best, days) }
+}
+
 const isObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null
 
@@ -72,6 +98,7 @@ export const useAppStore = create<AppState>()(
       sessions: [],
       settings: DEFAULT_SETTINGS,
       arcadeBest: {},
+      streak: EMPTY_STREAK,
       hydrated: false,
       typingActive: false,
 
@@ -145,7 +172,7 @@ export const useAppStore = create<AppState>()(
 
         set((s) => {
           const raw = [...s.sessions, session]
-          return { sessions: raw.slice(-1000) }
+          return { sessions: raw.slice(-1000), streak: advanceStreak(s.streak ?? EMPTY_STREAK) }
         })
         return session
       },
@@ -156,7 +183,7 @@ export const useAppStore = create<AppState>()(
         set((s) => ({ sessions: s.sessions.filter((x) => x.profileId !== id) })),
 
       resetAll: () =>
-        set({ profiles: [], currentProfileId: null, sessions: [], settings: DEFAULT_SETTINGS }),
+        set({ profiles: [], currentProfileId: null, sessions: [], settings: DEFAULT_SETTINGS, streak: EMPTY_STREAK }),
 
       exportData: () => {
         const s = get()
@@ -197,6 +224,7 @@ export const useAppStore = create<AppState>()(
         sessions: s.sessions,
         settings: s.settings,
         arcadeBest: s.arcadeBest,
+        streak: s.streak,
       }),
       // Deep-merge settings so newly added keys (e.g. theme) get their defaults.
       merge: (persisted, current) => {
@@ -205,6 +233,8 @@ export const useAppStore = create<AppState>()(
           ...current,
           ...p,
           settings: { ...current.settings, ...(p.settings ?? {}) },
+          // Old persisted state lacks `streak`; fall back to the empty default.
+          streak: p.streak ?? current.streak,
         }
       },
       onRehydrateStorage: () => (state) => {
