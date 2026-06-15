@@ -6,7 +6,6 @@ import type { Language } from '../types'
 import { KO_WORDS, EN_WORDS } from '../data/words'
 import {
   type DroppingWord,
-  matchesPrefix,
   isComplete,
   pickTarget,
   wordPoints,
@@ -44,6 +43,7 @@ export function ArcadePage() {
   const levelRef = useRef(0)
   const focusedRef = useRef<number | null>(null)
   const bufferRef = useRef('')
+  const mismatchRef = useRef(false)
   const idRef = useRef(0)
   const spawnAccRef = useRef(0)
   const lastTickRef = useRef(0)
@@ -139,6 +139,7 @@ export function ArcadePage() {
     levelRef.current = 0
     focusedRef.current = null
     bufferRef.current = ''
+    mismatchRef.current = false
     idRef.current = 0
     spawnAccRef.current = 0
     lastTickRef.current = 0
@@ -165,41 +166,35 @@ export function ArcadePage() {
       if (status !== 'playing') return
       const ta = e.currentTarget
       const composing = (e.nativeEvent as InputEvent).isComposing
-      const buf = ta.value
+      let buf = ta.value
+
+      // Whitespace can never be part of a (single-token) word, so a space/enter
+      // acts as a "clear" — flush the buffer instead of getting stuck.
+      if (/\s/.test(buf)) {
+        buf = ''
+        ta.value = ''
+      }
       bufferRef.current = buf
 
       if (buf.length === 0) {
         focusedRef.current = null
+        mismatchRef.current = false
         repaint()
         return
       }
 
       const words = wordsRef.current
-      // Keep the locked target if it still matches; otherwise re-acquire.
-      const cur = focusedRef.current != null ? words.find((w) => w.id === focusedRef.current) : undefined
-      if (!cur || !matchesPrefix(cur.text, buf, composing, language)) {
-        focusedRef.current = pickTarget(words, buf, composing, language)
-      }
 
-      const fid = focusedRef.current
-      if (fid == null) {
-        // Buffer matches no falling word → reject the keystroke, reset.
-        bufferRef.current = ''
-        ta.value = ''
-        comboRef.current = 0
-        if (soundRef.current) sound.error()
-        repaint()
-        return
-      }
-
-      const target = words.find((w) => w.id === fid)!
-      if (isComplete(target.text, buf)) {
-        wordsRef.current = words.filter((w) => w.id !== fid)
+      // Exact match → destroy that word.
+      const hit = words.find((w) => isComplete(w.text, buf))
+      if (hit) {
+        wordsRef.current = words.filter((w) => w.id !== hit.id)
         comboRef.current += 1
         if (comboRef.current > maxComboRef.current) maxComboRef.current = comboRef.current
         const mult = 1 + Math.floor(comboRef.current / 5) * 0.5
-        scoreRef.current += Math.round(wordPoints(target.text, language) * mult)
+        scoreRef.current += Math.round(wordPoints(hit.text, language) * mult)
         focusedRef.current = null
+        mismatchRef.current = false
         bufferRef.current = ''
         ta.value = ''
         if (soundRef.current) {
@@ -209,11 +204,19 @@ export function ArcadePage() {
         const layer = fieldRef.current
         if (fxRef.current && layer) {
           const r = layer.getBoundingClientRect()
-          spawnBurst(layer, (target.x / 100) * r.width, (target.y / 100) * r.height, { count: 10, power: 75 })
+          spawnBurst(layer, (hit.x / 100) * r.width, (hit.y / 100) * r.height, { count: 10, power: 75 })
         }
-      } else if (soundRef.current) {
-        sound.key()
+        repaint()
+        return
       }
+
+      // No full match yet: highlight the most urgent word this buffer prefixes.
+      // The buffer is NEVER auto-erased — if it matches nothing, we flag it red
+      // and let the player backspace (or hit space to clear). Free typing.
+      const tid = pickTarget(words, buf, composing, language)
+      focusedRef.current = tid
+      mismatchRef.current = tid == null
+      if (soundRef.current) sound.key()
       repaint()
     },
     [status, language],
@@ -290,8 +293,9 @@ export function ArcadePage() {
         {status === 'playing' && (
           <textarea
             ref={taRef}
-            className="arcade-input"
+            className={`arcade-input ${mismatchRef.current ? 'wrong' : ''}`}
             rows={1}
+            autoFocus
             onInput={onInput}
             onBlur={() => {
               if (status === 'playing') window.setTimeout(() => taRef.current?.focus(), 0)
