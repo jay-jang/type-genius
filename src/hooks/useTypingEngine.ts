@@ -31,6 +31,8 @@ interface EngineOptions extends EngineEvents {
   target: string
   language: Language
   enabled?: boolean
+  /** When set, the run auto-finishes once elapsed reaches this and scores only what was typed. */
+  timeLimitMs?: number
 }
 
 const EMPTY_STATS: LiveStats = {
@@ -41,7 +43,7 @@ const EMPTY_STATS: LiveStats = {
 const MINUTE = 60_000
 
 export function useTypingEngine(opts: EngineOptions) {
-  const { target, language, enabled = true } = opts
+  const { target, language, enabled = true, timeLimitMs } = opts
 
   // Latest event callbacks without retriggering effects.
   const cb = useRef<EngineEvents>(opts)
@@ -116,17 +118,22 @@ export function useTypingEngine(opts: EngineOptions) {
     const durationMs = Math.max(1, end - start)
     const mins = durationMs / MINUTE
 
+    // For a time-limited run, score only the frontier the user actually typed
+    // (committed characters), not the full generated word stream.
+    const scoreEnd = timeLimitMs != null ? Math.min(committedRef.current, target.length) : target.length
+
     let correctCount = 0
     let correctStrokes = 0
-    for (let i = 0; i < target.length; i++) {
+    for (let i = 0; i < scoreEnd; i++) {
       if (v[i] === target[i]) {
         correctCount++
         correctStrokes += language === 'ko' ? strokesForChar(target[i]) : 1
       }
     }
-    const charCount = target.replace(/[\n\r]/g, '').length
+    const scored = target.slice(0, scoreEnd)
+    const charCount = scored.replace(/[\n\r]/g, '').length
     const totalStrokes = language === 'ko'
-      ? [...target].reduce((a, c) => a + (c === '\n' || c === '\r' ? 0 : strokesForChar(c)), 0)
+      ? [...scored].reduce((a, c) => a + (c === '\n' || c === '\r' ? 0 : strokesForChar(c)), 0)
       : charCount
 
     const rawStrokes = language === 'ko' ? rawStrokesRef.current : enteredRef.current
@@ -160,7 +167,7 @@ export function useTypingEngine(opts: EngineOptions) {
     setFinished(true)
     setStats(computeLive())
     cb.current.onFinish?.(result)
-  }, [target, language, computeLive])
+  }, [target, language, computeLive, timeLimitMs])
 
   const evaluate = useCallback((v: string) => {
     if (startRef.current == null && v.length > 0) startRef.current = performance.now()
@@ -297,6 +304,10 @@ export function useTypingEngine(opts: EngineOptions) {
       if (startRef.current == null || finishedRef.current) return
       const live = computeLive()
       setStats(live)
+      if (timeLimitMs != null && live.elapsedMs >= timeLimitMs) {
+        finalize()
+        return
+      }
       const sec = Math.floor(live.elapsedMs / 1000)
       if (sec >= 1 && sec > lastSampleSecRef.current) {
         lastSampleSecRef.current = sec
@@ -310,7 +321,7 @@ export function useTypingEngine(opts: EngineOptions) {
       }
     }, 200)
     return () => window.clearInterval(id)
-  }, [computeLive])
+  }, [computeLive, timeLimitMs, finalize])
 
   const focus = useCallback(() => taRef.current?.focus(), [])
 

@@ -47,7 +47,11 @@ export function ResultsPage() {
       ? `${MODE_LABELS[meta.mode]} · 오답`
       : meta.genre === 'custom'
         ? `${MODE_LABELS[meta.mode]} · 내 글`
-        : `${MODE_LABELS[meta.mode]} · ${GENRE_LABELS[meta.genre]}`
+        : meta.genre === 'time'
+          ? `${MODE_LABELS[meta.mode]} · 시간`
+          : meta.genre === 'words'
+            ? `${MODE_LABELS[meta.mode]} · 단어`
+            : `${MODE_LABELS[meta.mode]} · ${GENRE_LABELS[meta.genre]}`
 
   return (
     <div className="screen results">

@@ -32,7 +32,7 @@ export interface SessionResult {
   profileId: string
   mode: PracticeMode
   language: Language
-  genre: Genre | 'drill' | 'custom'
+  genre: Genre | 'drill' | 'custom' | 'time' | 'words'
   textId: string
   textTitle: string
   /** English-style words/min (chars/5). */

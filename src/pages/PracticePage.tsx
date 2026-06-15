@@ -4,15 +4,31 @@ import { ConfigBar } from '../components/ConfigBar'
 import { TypingArea } from '../components/TypingArea'
 
 export function PracticePage() {
-  const { config, queue, index, drill, custom, runId, reroll, finishPractice } = useNav()
+  const { config, queue, index, drill, custom, wordRun, runId, reroll, finishPractice } = useNav()
 
   let target: string
   let meta: PracticeMeta
   let title: string
   let subtitle: string | undefined
   let badge: string | undefined
+  let timeLimitMs: number | undefined
 
-  if (custom) {
+  if (wordRun) {
+    target = wordRun.text
+    timeLimitMs = wordRun.kind === 'time' ? wordRun.limit * 1000 : undefined
+    title = wordRun.kind === 'time' ? `${wordRun.limit}초 도전` : `${wordRun.limit}단어`
+    subtitle = wordRun.kind === 'time' ? '제한 시간 동안 친 만큼 기록돼요' : '랜덤 단어 연습'
+    badge = wordRun.kind === 'time' ? '시간' : '단어'
+    meta = {
+      mode: config.mode,
+      language: wordRun.language,
+      genre: wordRun.kind,
+      textId: `${wordRun.kind}-${wordRun.limit}`,
+      textTitle: title,
+      text: wordRun.text,
+      isDrill: false,
+    }
+  } else if (custom) {
     target = custom.text
     title = '내 글 연습'
     subtitle = '직접 붙여넣은 글 · 기록·랭킹에는 반영되지 않아요'
@@ -79,6 +95,7 @@ export function PracticePage() {
         title={title}
         subtitle={subtitle}
         badge={badge}
+        timeLimitMs={timeLimitMs}
         onFinish={(r) => finishPractice(r, meta)}
       />
     </div>

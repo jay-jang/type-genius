@@ -1,4 +1,4 @@
-import { useNav } from '../app/nav'
+import { useNav, TIME_LIMITS, WORD_LIMITS, type TestKind } from '../app/nav'
 import { GENRE_LABELS, GENRES, DIFFICULTY_LABELS } from '../data'
 import { IconRedo, IconBook } from './Icons'
 import type { Difficulty, Genre, PracticeMode } from '../types'
@@ -8,10 +8,16 @@ const MODES: { id: PracticeMode; label: string }[] = [
   { id: 'en', label: 'English' },
   { id: 'mixed', label: '복합' },
 ]
+const KINDS: { id: TestKind; label: string }[] = [
+  { id: 'passage', label: '글' },
+  { id: 'time', label: '시간' },
+  { id: 'words', label: '단어' },
+]
 const DIFFS: (Difficulty | 'all')[] = ['all', 'easy', 'medium', 'hard']
 
 export function ConfigBar() {
-  const { config, setConfig, reroll, openLibrary } = useNav()
+  const { config, setConfig, startTest, reroll, openLibrary } = useNav()
+  const limits = config.testKind === 'time' ? TIME_LIMITS : config.testKind === 'words' ? WORD_LIMITS : []
 
   return (
     <div className="config-bar">
@@ -31,39 +37,76 @@ export function ConfigBar() {
       <span className="config-sep" />
 
       <div className="config-group">
-        <button
-          className={`config-opt ${config.genre === 'all' ? 'on' : ''}`}
-          aria-pressed={config.genre === 'all'}
-          onClick={() => setConfig({ genre: 'all' })}
-        >
-          전체
-        </button>
-        {GENRES.map((g: Genre) => (
+        {KINDS.map((k) => (
           <button
-            key={g}
-            className={`config-opt ${config.genre === g ? 'on' : ''}`}
-            aria-pressed={config.genre === g}
-            onClick={() => setConfig({ genre: g })}
+            key={k.id}
+            className={`config-opt ${config.testKind === k.id ? 'on' : ''}`}
+            aria-pressed={config.testKind === k.id}
+            onClick={() => startTest({ testKind: k.id })}
           >
-            {GENRE_LABELS[g]}
+            {k.label}
           </button>
         ))}
       </div>
 
-      <span className="config-sep" />
+      {limits.length > 0 && (
+        <>
+          <span className="config-sep" />
+          <div className="config-group">
+            {limits.map((n) => (
+              <button
+                key={n}
+                className={`config-opt ${config.limit === n ? 'on' : ''}`}
+                aria-pressed={config.limit === n}
+                onClick={() => startTest({ limit: n })}
+              >
+                {config.testKind === 'time' ? `${n}초` : `${n}단어`}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
-      <div className="config-group">
-        {DIFFS.map((d) => (
-          <button
-            key={d}
-            className={`config-opt ${config.difficulty === d ? 'on' : ''}`}
-            aria-pressed={config.difficulty === d}
-            onClick={() => setConfig({ difficulty: d })}
-          >
-            {d === 'all' ? '난이도' : DIFFICULTY_LABELS[d]}
-          </button>
-        ))}
-      </div>
+      {config.testKind === 'passage' && (
+        <>
+          <span className="config-sep" />
+
+          <div className="config-group">
+            <button
+              className={`config-opt ${config.genre === 'all' ? 'on' : ''}`}
+              aria-pressed={config.genre === 'all'}
+              onClick={() => setConfig({ genre: 'all' })}
+            >
+              전체
+            </button>
+            {GENRES.map((g: Genre) => (
+              <button
+                key={g}
+                className={`config-opt ${config.genre === g ? 'on' : ''}`}
+                aria-pressed={config.genre === g}
+                onClick={() => setConfig({ genre: g })}
+              >
+                {GENRE_LABELS[g]}
+              </button>
+            ))}
+          </div>
+
+          <span className="config-sep" />
+
+          <div className="config-group">
+            {DIFFS.map((d) => (
+              <button
+                key={d}
+                className={`config-opt ${config.difficulty === d ? 'on' : ''}`}
+                aria-pressed={config.difficulty === d}
+                onClick={() => setConfig({ difficulty: d })}
+              >
+                {d === 'all' ? '난이도' : DIFFICULTY_LABELS[d]}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       <span className="config-sep" />
 

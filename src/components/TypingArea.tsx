@@ -13,10 +13,11 @@ interface TypingAreaProps {
   title: string
   subtitle?: string
   badge?: string
+  timeLimitMs?: number
   onFinish: (result: EngineResult) => void
 }
 
-export function TypingArea({ target, language, title, subtitle, badge, onFinish }: TypingAreaProps) {
+export function TypingArea({ target, language, title, subtitle, badge, timeLimitMs, onFinish }: TypingAreaProps) {
   const settings = useAppStore((s) => s.settings)
   const setTyping = useAppStore((s) => s.setTyping)
   const prefersReducedMotion =
@@ -46,6 +47,7 @@ export function TypingArea({ target, language, title, subtitle, badge, onFinish 
   const engine = useTypingEngine({
     target,
     language,
+    timeLimitMs,
     onCorrect: () => {
       sound.key()
       if (effectsOn) fxAtCaret((x, y) => spawnBurst(fxRef.current!, x, y, { count: 2, power: 34, size: 4 }))
