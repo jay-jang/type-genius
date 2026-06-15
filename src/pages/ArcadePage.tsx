@@ -287,20 +287,24 @@ export function ArcadePage() {
           </div>
         )}
 
-        <textarea
-          ref={taRef}
-          className="arcade-input"
-          onInput={onInput}
-          onBlur={() => {
-            if (status === 'playing') window.setTimeout(() => taRef.current?.focus(), 0)
-          }}
-          defaultValue=""
-          spellCheck={false}
-          autoCapitalize="off"
-          autoCorrect="off"
-          autoComplete="off"
-          aria-label="타이핑 입력"
-        />
+        {status === 'playing' && (
+          <textarea
+            ref={taRef}
+            className="arcade-input"
+            rows={1}
+            onInput={onInput}
+            onBlur={() => {
+              if (status === 'playing') window.setTimeout(() => taRef.current?.focus(), 0)
+            }}
+            defaultValue=""
+            placeholder="여기에 입력…"
+            spellCheck={false}
+            autoCapitalize="off"
+            autoCorrect="off"
+            autoComplete="off"
+            aria-label="타이핑 입력"
+          />
+        )}
       </div>
 
       <p className="arcade-hint">단어를 그대로 입력하면 격파됩니다 · 콤보 5마다 점수 배율 ↑</p>

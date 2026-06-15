@@ -2080,16 +2080,36 @@ kbd {
 }
 .arcade-input {
   position: absolute;
-  bottom: 8px;
-  left: 8px;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  border: none;
-  background: transparent;
-  color: transparent;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(440px, 82%);
+  height: 2.9em;
+  padding: 0.55em 0.9em;
+  border: 2px solid var(--main);
+  border-radius: var(--round);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
   resize: none;
-  caret-color: transparent;
+  caret-color: var(--main);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--main) 22%, transparent);
+}
+.arcade-input::placeholder {
+  color: var(--sub);
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+.arcade-input:focus {
+  outline: none;
+  border-color: var(--main);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--main) 38%, transparent);
 }
 .arcade-overlay {
   position: absolute;
