@@ -3,10 +3,10 @@ import { useNav } from '../app/nav'
 import { useAppStore } from '../store/useAppStore'
 import { sound } from '../lib/sound'
 import { AuthModal } from './AuthModal'
-import { IconKeyboard, IconHome, IconBook, IconCrown, IconUser, IconVolume, IconTarget } from './Icons'
+import { IconKeyboard, IconHome, IconBook, IconCrown, IconUser, IconVolume, IconTarget, IconChart } from './Icons'
 
 export function TopBar() {
-  const { screen, goHome, openLibrary, goRankings, goProfile, goArcade } = useNav()
+  const { screen, goHome, openLibrary, goRankings, goProfile, goArcade, goActivity } = useNav()
   const profiles = useAppStore((s) => s.profiles)
   const currentId = useAppStore((s) => s.currentProfileId)
   const settings = useAppStore((s) => s.settings)
@@ -43,6 +43,9 @@ export function TopBar() {
         </button>
         <button className={`navbtn ${screen === 'arcade' ? 'on' : ''}`} onClick={goArcade} title="산성비 게임" aria-label="산성비 게임">
           <IconTarget />
+        </button>
+        <button className={`navbtn ${screen === 'activity' ? 'on' : ''}`} onClick={goActivity} title="활동 기록" aria-label="활동 기록">
+          <IconChart />
         </button>
         <button className={`navbtn ${screen === 'rankings' ? 'on' : ''}`} onClick={goRankings} title="랭킹" aria-label="랭킹">
           <IconCrown />

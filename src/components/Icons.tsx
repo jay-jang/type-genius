@@ -74,6 +74,12 @@ export const IconVolume = ({ size = 20, className, on = true }: P & { on?: boole
   </svg>
 )
 
+export const IconChart = ({ size = 20, className }: P) => (
+  <svg {...base(size)} className={className} aria-hidden>
+    <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+  </svg>
+)
+
 export const IconHome = ({ size = 20, className }: P) => (
   <svg {...base(size)} className={className} aria-hidden>
     <path d="M3 11l9-8 9 8" />

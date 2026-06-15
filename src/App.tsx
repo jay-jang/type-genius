@@ -12,6 +12,7 @@ import { ResultsPage } from './pages/ResultsPage'
 import { RankingsPage } from './pages/RankingsPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { ArcadePage } from './pages/ArcadePage'
+import { ActivityPage } from './pages/ActivityPage'
 
 function Screens() {
   const { screen } = useNav()
@@ -28,6 +29,8 @@ function Screens() {
       return <ProfilePage />
     case 'arcade':
       return <ArcadePage />
+    case 'activity':
+      return <ActivityPage />
     case 'practice':
     default:
       return <PracticePage />
