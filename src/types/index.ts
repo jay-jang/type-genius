@@ -32,7 +32,7 @@ export interface SessionResult {
   profileId: string
   mode: PracticeMode
   language: Language
-  genre: Genre | 'drill' | 'custom' | 'time' | 'words'
+  genre: Genre | 'drill' | 'custom' | 'time' | 'words' | 'arcade'
   textId: string
   textTitle: string
   /** English-style words/min (chars/5). */
@@ -51,6 +51,8 @@ export interface SessionResult {
   errorCount: number
   maxCombo: number
   isDrill: boolean
+  /** Arcade (산성비) game points. Only set for genre 'arcade'. */
+  score?: number
   /** Target characters at the positions the typist mistyped (whitespace excluded). Optional: old sessions lack it. */
   errorChars?: string[]
   timestamp: number

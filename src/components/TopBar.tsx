@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useNav } from '../app/nav'
 import { useAppStore } from '../store/useAppStore'
 import { sound } from '../lib/sound'
+import { AuthModal } from './AuthModal'
 import { IconKeyboard, IconHome, IconBook, IconCrown, IconUser, IconVolume, IconTarget } from './Icons'
 
 export function TopBar() {
@@ -9,7 +11,10 @@ export function TopBar() {
   const currentId = useAppStore((s) => s.currentProfileId)
   const settings = useAppStore((s) => s.settings)
   const updateSettings = useAppStore((s) => s.updateSettings)
+  const auth = useAppStore((s) => s.auth)
+  const logout = useAppStore((s) => s.logout)
   const profile = profiles.find((p) => p.id === currentId)
+  const [authOpen, setAuthOpen] = useState(false)
 
   const toggleSound = () => {
     const next = !settings.soundEnabled
@@ -57,6 +62,19 @@ export function TopBar() {
         >
           <IconVolume on={settings.soundEnabled} />
         </button>
+        {auth ? (
+          <button
+            className="link-btn account-chip"
+            onClick={() => { if (confirm('로그아웃할까요? 기록은 계정에 저장돼 있어요.')) logout() }}
+            title="로그아웃"
+          >
+            @{auth.user.username} · 로그아웃
+          </button>
+        ) : (
+          <button className="btn sm" onClick={() => setAuthOpen(true)} title="로그인 / 가입">
+            로그인
+          </button>
+        )}
         <button className="profile-chip" onClick={goProfile} title="프로필">
           <span className="avatar sm" style={{ background: profile?.color ?? 'var(--main)' }}>
             {profile?.name?.[0]?.toUpperCase() ?? '?'}
@@ -64,6 +82,7 @@ export function TopBar() {
           <span className="profile-name">{profile?.name ?? '게스트'}</span>
         </button>
       </div>
+      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
     </header>
   )
 }

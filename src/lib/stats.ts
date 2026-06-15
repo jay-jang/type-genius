@@ -45,7 +45,7 @@ export function sessionsForProfile(sessions: SessionResult[], profileId: string 
  * difficulty — both would distort rankings, so they're excluded.
  */
 export function isRanked(s: SessionResult): boolean {
-  return !s.isDrill && s.genre !== 'custom'
+  return !s.isDrill && s.genre !== 'custom' && s.genre !== 'arcade'
 }
 
 /** XP rewards length, speed and accuracy together. */

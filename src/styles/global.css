@@ -2159,3 +2159,110 @@ kbd {
   color: var(--sub);
   font-size: 0.85rem;
 }
+
+/* --- Auth (login / signup) ----------------------------------------------- */
+.account-chip {
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.auth-tabs {
+  display: flex;
+  gap: 0.4rem;
+}
+.auth-tab {
+  flex: 1;
+  padding: 0.55em 0;
+  border: none;
+  border-radius: var(--round);
+  background: var(--bg);
+  color: var(--sub);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.auth-tab.on {
+  background: var(--main);
+  color: var(--bg);
+}
+.auth-input {
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.7em 0.9em;
+  border: 1px solid var(--border);
+  border-radius: var(--round);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+}
+.auth-input:focus {
+  outline: none;
+  border-color: var(--main);
+}
+.auth-error {
+  margin-top: 0.6rem;
+  color: var(--error);
+  font-size: 0.85rem;
+}
+
+/* --- Comprehensive activity record --------------------------------------- */
+.card-sub {
+  color: var(--sub);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.activity-types {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+.activity-row {
+  display: grid;
+  grid-template-columns: minmax(96px, auto) 1fr auto auto;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.88rem;
+}
+.ar-name {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ar-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.ar-fill {
+  display: block;
+  height: 100%;
+  background: var(--main);
+  border-radius: 999px;
+}
+.ar-count {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ar-last {
+  color: var(--sub);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+.activity-cal {
+  display: flex;
+  gap: 4px;
+  margin-top: 0.9rem;
+}
+.acal-day {
+  flex: 1;
+  height: 22px;
+  border-radius: 4px;
+  background: var(--sub-alt);
+}
+.acal-day.on {
+  background: var(--main);
+}

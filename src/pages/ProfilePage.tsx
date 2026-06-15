@@ -14,6 +14,7 @@ import {
   MODE_LABELS,
 } from '../lib/stats'
 import { evaluateAchievements } from '../lib/achievements'
+import { summarizeActivity } from '../lib/activity'
 import { formatDuration, formatTimeAgo } from '../lib/metrics'
 import { sound } from '../lib/sound'
 import { THEMES } from '../data/themes'
@@ -31,6 +32,7 @@ export function ProfilePage() {
   const sessions = useAppStore((s) => s.sessions)
   const settings = useAppStore((s) => s.settings)
   const streak = useAppStore((s) => s.streak)
+  const auth = useAppStore((s) => s.auth)
   const addProfile = useAppStore((s) => s.addProfile)
   const selectProfile = useAppStore((s) => s.selectProfile)
   const renameProfile = useAppStore((s) => s.renameProfile)
@@ -89,6 +91,9 @@ export function ProfilePage() {
   )
   const unlockedCount = badges.filter((b) => b.unlocked).length
 
+  const activity = useMemo(() => summarizeActivity(mine), [mine])
+  const maxDaily = Math.max(1, ...activity.recentDaily.map((d) => d.count))
+
   // The weakness card analyzes one concrete language. 복합(mixed) folds into Korean.
   const weakLang: Language = space === 'en' ? 'en' : 'ko'
   const units = useMemo(
@@ -145,6 +150,58 @@ export function ProfilePage() {
           <Mini label="현재 연속" value={`${streak.days}일`} />
           <Mini label="최고 연속" value={`${streak.best}일`} />
         </div>
+      </div>
+
+      {/* Comprehensive activity record */}
+      <div className="card activity-card">
+        <div className="card-head">
+          <span>🗂 활동 기록</span>
+          <span className="card-sub">
+            {auth ? `@${auth.user.username} · 계정에 저장됨` : '게스트 · 로그인하면 계정에 보관돼요'}
+          </span>
+        </div>
+        <div className="ps-stats">
+          <Mini label="총 플레이" value={activity.totalPlays} />
+          <Mini label="활동한 날" value={`${activity.activeDays}일`} />
+          <Mini label="최근 7일" value={`${activity.playsLast7}회`} />
+          <Mini label="최근 30일" value={`${activity.playsLast30}회`} />
+        </div>
+
+        {activity.byType.length > 0 ? (
+          <>
+            <div className="activity-types">
+              {activity.byType.map((t) => (
+                <div className="activity-row" key={t.key}>
+                  <span className="ar-name">
+                    {t.icon} {t.label}
+                  </span>
+                  <span className="ar-bar">
+                    <span
+                      className="ar-fill"
+                      style={{ width: `${Math.round((t.count / activity.totalPlays) * 100)}%` }}
+                    />
+                  </span>
+                  <span className="ar-count">{t.count}회</span>
+                  <span className="ar-last">{formatTimeAgo(t.lastPlayed, Date.now())}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="activity-cal" aria-label="최근 14일 활동">
+              {activity.recentDaily.map((d) => (
+                <span
+                  key={d.date}
+                  className={`acal-day ${d.count > 0 ? 'on' : ''}`}
+                  style={{ opacity: d.count > 0 ? 0.35 + 0.65 * (d.count / maxDaily) : undefined }}
+                  title={`${d.date} · ${d.count}회`}
+                />
+              ))}
+            </div>
+            <p className="card-sub">최근 14일 · 무슨 게임을 얼마나 자주 했는지</p>
+          </>
+        ) : (
+          <p className="empty-msg sm">아직 플레이 기록이 없어요. 한 판 해볼까요?</p>
+        )}
       </div>
 
       {/* Achievements */}

@@ -23,6 +23,21 @@ export const DEFAULT_SETTINGS: Settings = {
   smoothCaret: true,
 }
 
+/** A signed-in account (token persists locally so login survives reloads). */
+export interface AuthUser {
+  id: string
+  username: string
+  createdAt: number
+}
+export interface Auth {
+  token: string
+  user: AuthUser
+}
+export interface AuthResult {
+  ok: boolean
+  error?: string
+}
+
 interface AppState {
   profiles: Profile[]
   currentProfileId: string | null
@@ -32,11 +47,18 @@ interface AppState {
   arcadeBest: Record<string, number>
   /** Daily-practice streak, advanced on every recorded session. */
   streak: Streak
+  /** Signed-in account, or null when playing as a local guest. */
+  auth: Auth | null
   hydrated: boolean
   typingActive: boolean
 
   setTyping: (active: boolean) => void
   recordArcade: (language: Language, score: number) => number
+  register: (username: string, password: string) => Promise<AuthResult>
+  login: (username: string, password: string) => Promise<AuthResult>
+  logout: () => void
+  syncUp: () => Promise<void>
+  refreshFromServer: () => Promise<void>
   ensureDefaultProfile: () => void
   addProfile: (name: string) => Profile
   selectProfile: (id: string) => void
@@ -90,15 +112,48 @@ function advanceStreak(prev: Streak): Streak {
 const isObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null
 
+/** The user-data slice we persist server-side for a signed-in account. */
+interface SyncData {
+  profiles: Profile[]
+  sessions: SessionResult[]
+  arcadeBest: Record<string, number>
+  streak: Streak
+}
+function dataFrom(s: AppState): SyncData {
+  return { profiles: s.profiles, sessions: s.sessions, arcadeBest: s.arcadeBest, streak: s.streak }
+}
+
 export const useAppStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      // Debounced background sync — coalesces bursts of record() calls.
+      let syncTimer: ReturnType<typeof setTimeout> | null = null
+      const scheduleSync = () => {
+        if (!get().auth) return
+        if (syncTimer) clearTimeout(syncTimer)
+        syncTimer = setTimeout(() => {
+          void get().syncUp()
+        }, 1500)
+      }
+      // Load a server data blob into local state, keeping a valid current profile.
+      const applyData = (data: unknown) => {
+        const d = (isObject(data) ? data : {}) as Partial<SyncData>
+        const profiles = Array.isArray(d.profiles) ? d.profiles : []
+        const sessions = Array.isArray(d.sessions) ? d.sessions.slice(-1000) : []
+        const arcadeBest = isObject(d.arcadeBest) ? (d.arcadeBest as Record<string, number>) : {}
+        const streak = isObject(d.streak) ? (d.streak as Streak) : EMPTY_STREAK
+        set({ profiles, sessions, arcadeBest, streak, currentProfileId: profiles[0]?.id ?? null })
+        get().ensureDefaultProfile()
+      }
+
+      return {
       profiles: [],
       currentProfileId: null,
       sessions: [],
       settings: DEFAULT_SETTINGS,
       arcadeBest: {},
       streak: EMPTY_STREAK,
+      auth: null,
       hydrated: false,
       typingActive: false,
 
@@ -110,7 +165,75 @@ export const useAppStore = create<AppState>()(
         const key = `${pid}:${language}`
         const best = Math.max(get().arcadeBest[key] ?? 0, score)
         set((s) => ({ arcadeBest: { ...s.arcadeBest, [key]: best } }))
+        scheduleSync()
         return best
+      },
+
+      register: async (username, password) => {
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, data: dataFrom(get()) }),
+          })
+          const json = await res.json().catch(() => ({}))
+          if (!res.ok) return { ok: false, error: json.error || '가입에 실패했어요.' }
+          set({ auth: { token: json.token, user: json.user } })
+          applyData(json.data)
+          return { ok: true }
+        } catch {
+          return { ok: false, error: '서버에 연결할 수 없어요.' }
+        }
+      },
+
+      login: async (username, password) => {
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+          })
+          const json = await res.json().catch(() => ({}))
+          if (!res.ok) return { ok: false, error: json.error || '로그인에 실패했어요.' }
+          set({ auth: { token: json.token, user: json.user } })
+          applyData(json.data)
+          return { ok: true }
+        } catch {
+          return { ok: false, error: '서버에 연결할 수 없어요.' }
+        }
+      },
+
+      logout: () => set({ auth: null }), // keep local data as a guest
+
+      syncUp: async () => {
+        const auth = get().auth
+        if (!auth) return
+        try {
+          await fetch('/api/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${auth.token}` },
+            body: JSON.stringify({ data: dataFrom(get()) }),
+          })
+        } catch {
+          /* offline — local stays source of truth, retried on next record */
+        }
+      },
+
+      refreshFromServer: async () => {
+        const auth = get().auth
+        if (!auth) return
+        try {
+          const res = await fetch('/api/me', { headers: { Authorization: `Bearer ${auth.token}` } })
+          if (res.status === 401) {
+            set({ auth: null }) // token expired/invalid → drop to guest
+            return
+          }
+          if (!res.ok) return
+          const json = await res.json()
+          if (json?.data) applyData(json.data)
+        } catch {
+          /* offline — keep local */
+        }
       },
 
       ensureDefaultProfile: () => {
@@ -156,9 +279,11 @@ export const useAppStore = create<AppState>()(
         if (!profileId) return null
         const session: SessionResult = { ...r, id: uid(), profileId, timestamp: Date.now() }
 
-        // Send to server in the background, catch errors silently for offline resilience
+        // Guests upload single sessions to the shared leaderboard (offline-safe).
+        // Signed-in accounts instead get a full-record sync (scheduled below), so
+        // skip the legacy upload to avoid double-counting.
         const profile = get().profiles.find((p) => p.id === profileId)
-        if (profile) {
+        if (profile && !get().auth) {
           fetch('/api/sessions', {
             method: 'POST',
             headers: {
@@ -174,6 +299,7 @@ export const useAppStore = create<AppState>()(
           const raw = [...s.sessions, session]
           return { sessions: raw.slice(-1000), streak: advanceStreak(s.streak ?? EMPTY_STREAK) }
         })
+        scheduleSync()
         return session
       },
 
@@ -212,9 +338,11 @@ export const useAppStore = create<AppState>()(
         const currentProfileId =
           wanted && profiles.some((p) => p.id === wanted) ? wanted : (profiles[0]?.id ?? null)
         set({ profiles, currentProfileId, sessions, settings })
+        scheduleSync()
         return true
       },
-    }),
+      }
+    },
     {
       name: 'type-genius-v1',
       version: 1,
@@ -225,6 +353,7 @@ export const useAppStore = create<AppState>()(
         settings: s.settings,
         arcadeBest: s.arcadeBest,
         streak: s.streak,
+        auth: s.auth,
       }),
       // Deep-merge settings so newly added keys (e.g. theme) get their defaults.
       merge: (persisted, current) => {
@@ -240,6 +369,8 @@ export const useAppStore = create<AppState>()(
       onRehydrateStorage: () => (state) => {
         state?.ensureDefaultProfile()
         useAppStore.setState({ hydrated: true })
+        // If a token survived the reload, pull the account's latest record.
+        if (state?.auth) void state.refreshFromServer()
       },
     },
   ),

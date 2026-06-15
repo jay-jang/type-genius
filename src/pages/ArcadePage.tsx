@@ -28,6 +28,7 @@ export function ArcadePage() {
   const currentId = useAppStore((s) => s.currentProfileId)
   const arcadeBest = useAppStore((s) => s.arcadeBest)
   const recordArcade = useAppStore((s) => s.recordArcade)
+  const recordSession = useAppStore((s) => s.recordSession)
 
   const [status, setStatus] = useState<'ready' | 'playing' | 'over'>('ready')
   const [language, setLanguage] = useState<Language>('ko')
@@ -48,6 +49,7 @@ export function ArcadePage() {
   const spawnAccRef = useRef(0)
   const lastTickRef = useRef(0)
   const rafRef = useRef(0)
+  const gameStartRef = useRef(0)
   const finalRef = useRef({ score: 0, best: 0, record: false })
 
   // Settings read through refs so the loop's identity stays stable mid-game.
@@ -75,9 +77,29 @@ export function ArcadePage() {
     const prevBest = best
     const newBest = recordArcade(language, score)
     finalRef.current = { score, best: newBest, record: score > 0 && score >= newBest && score > prevBest }
+    // Log the play as a session so it shows up in the comprehensive activity record.
+    recordSession({
+      mode: language,
+      language,
+      genre: 'arcade',
+      textId: 'arcade',
+      textTitle: '산성비',
+      wpm: 0,
+      cpm: 0,
+      rawWpm: 0,
+      accuracy: 100,
+      consistency: 100,
+      durationMs: Math.max(1, Date.now() - gameStartRef.current),
+      charCount: 0,
+      strokeCount: 0,
+      errorCount: LIVES - Math.max(0, livesRef.current),
+      maxCombo: maxComboRef.current,
+      isDrill: false,
+      score,
+    })
     setStatus('over')
     if (soundRef.current) sound.complete()
-  }, [language, recordArcade, best])
+  }, [language, recordArcade, recordSession, best])
 
   const loop = useCallback(
     (now: number) => {
@@ -143,6 +165,7 @@ export function ArcadePage() {
     idRef.current = 0
     spawnAccRef.current = 0
     lastTickRef.current = 0
+    gameStartRef.current = Date.now()
     if (taRef.current) taRef.current.value = ''
     sound.resume()
     setStatus('playing')
