@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import type { Difficulty, Genre, Language, PracticeMode } from '../types'
 import type { EngineResult } from '../hooks/useTypingEngine'
 import { pickRandom } from '../data'
+import { hangulRatio } from '../lib/hangul'
 import { useAppStore } from '../store/useAppStore'
 
 export type Screen = 'home' | 'practice' | 'library' | 'results' | 'rankings' | 'profile'
@@ -19,10 +20,16 @@ export interface Drill {
   sourceTextId: string
 }
 
+/** Arbitrary text the user pasted in to practice on. Not ranked. */
+export interface CustomText {
+  text: string
+  language: Language
+}
+
 export interface PracticeMeta {
   mode: PracticeMode
   language: Language
-  genre: Genre | 'drill'
+  genre: Genre | 'drill' | 'custom'
   textId: string
   textTitle: string
   text: string
@@ -41,6 +48,7 @@ interface NavValue {
   queue: string[]
   index: number
   drill: Drill | null
+  custom: CustomText | null
   runId: number
   lastResult: LastResult | null
 
@@ -56,6 +64,7 @@ interface NavValue {
   retry: () => void
   next: () => void
   startDrill: (drill: Drill) => void
+  startCustom: (text: string) => void
   finishPractice: (result: EngineResult, meta: PracticeMeta) => void
 }
 
@@ -90,6 +99,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
   })
   const [index, setIndex] = useState(0)
   const [drill, setDrill] = useState<Drill | null>(null)
+  const [custom, setCustom] = useState<CustomText | null>(null)
   const [runId, setRunId] = useState(0)
   const [lastResult, setLastResult] = useState<LastResult | null>(null)
 
@@ -101,6 +111,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
       setQueue(p ? [p.id] : [])
       setIndex(0)
       setDrill(null)
+      setCustom(null)
       bump()
       setScreen('practice')
     },
@@ -134,6 +145,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
       setQueue([id])
       setIndex(0)
       setDrill(null)
+      setCustom(null)
       bump()
       setScreen('practice')
     },
@@ -150,6 +162,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const next = useCallback(() => {
     setDrill(null)
+    setCustom(null)
     const cur = queue[index]
     const p = pickFor(config, cur)
     if (p) {
@@ -162,7 +175,21 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const startDrill = useCallback(
     (d: Drill) => {
+      setCustom(null)
       setDrill(d)
+      bump()
+      setScreen('practice')
+    },
+    [bump],
+  )
+
+  const startCustom = useCallback(
+    (text: string) => {
+      const trimmed = text.trim()
+      if (!trimmed) return
+      const language: Language = hangulRatio(trimmed) >= 0.3 ? 'ko' : 'en'
+      setDrill(null)
+      setCustom({ text: trimmed, language })
       bump()
       setScreen('practice')
     },
@@ -197,14 +224,14 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<NavValue>(
     () => ({
-      screen, space: config.mode, config, queue, index, drill, runId, lastResult,
+      screen, space: config.mode, config, queue, index, drill, custom, runId, lastResult,
       goHome, openLibrary, goRankings, goProfile, setConfig, reroll,
-      startPassage, startRandom, startMixed, retry, next, startDrill, finishPractice,
+      startPassage, startRandom, startMixed, retry, next, startDrill, startCustom, finishPractice,
     }),
     [
-      screen, config, queue, index, drill, runId, lastResult,
+      screen, config, queue, index, drill, custom, runId, lastResult,
       goHome, openLibrary, goRankings, goProfile, setConfig, reroll,
-      startPassage, startRandom, startMixed, retry, next, startDrill, finishPractice,
+      startPassage, startRandom, startMixed, retry, next, startDrill, startCustom, finishPractice,
     ],
   )
 

@@ -39,6 +39,15 @@ export function sessionsForProfile(sessions: SessionResult[], profileId: string 
   return sessions.filter((s) => s.profileId === profileId)
 }
 
+/**
+ * Whether a session counts toward records, XP and leaderboards. Drills are short
+ * and error-heavy by design; custom runs use arbitrary pasted text of unknown
+ * difficulty — both would distort rankings, so they're excluded.
+ */
+export function isRanked(s: SessionResult): boolean {
+  return !s.isDrill && s.genre !== 'custom'
+}
+
 /** XP rewards length, speed and accuracy together. */
 export function xpForSession(s: SessionResult): number {
   return Math.round((s.strokeCount / 5) * (s.accuracy / 100) * (1 + sessionScore(s) / 200))
@@ -68,7 +77,7 @@ export function summarize(sessions: SessionResult[]): ProfileSummary {
   }
   // Best / average / XP exclude drill runs (short, error-heavy by design) so
   // they don't inflate records or contradict the leaderboard. Totals keep all.
-  const ranked = sessions.filter((s) => !s.isDrill)
+  const ranked = sessions.filter(isRanked)
   const totalChars = sessions.reduce((a, s) => a + s.charCount, 0)
   const totalStrokes = sessions.reduce((a, s) => a + s.strokeCount, 0)
   const totalTimeMs = sessions.reduce((a, s) => a + s.durationMs, 0)
@@ -102,7 +111,7 @@ export function leaderboard(
 ): RankRow[] {
   const rows: RankRow[] = []
   for (const profile of profiles) {
-    const mine = sessions.filter((s) => s.profileId === profile.id && s.mode === mode && !s.isDrill)
+    const mine = sessions.filter((s) => s.profileId === profile.id && s.mode === mode && isRanked(s))
     if (mine.length === 0) continue
     rows.push({
       profile,
@@ -122,7 +131,7 @@ export function improvementSeries(
   mode?: PracticeMode,
 ): { t: number; score: number; accuracy: number }[] {
   return sessions
-    .filter((s) => s.profileId === profileId && (!mode || s.mode === mode) && !s.isDrill)
+    .filter((s) => s.profileId === profileId && (!mode || s.mode === mode) && isRanked(s))
     .sort((a, b) => a.timestamp - b.timestamp)
     .map((s) => ({ t: s.timestamp, score: Math.round(sessionScore(s)), accuracy: Math.round(s.accuracy) }))
 }

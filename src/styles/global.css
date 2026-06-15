@@ -1356,6 +1356,60 @@ kbd {
   color: var(--main);
   font-weight: 700;
 }
+
+/* --- Custom-text modal ---------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--bg) 72%, #000);
+}
+.modal {
+  width: min(560px, 100%);
+  background: var(--sub-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--round);
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.modal-sub {
+  color: var(--sub);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.custom-area {
+  width: 100%;
+  min-height: 9rem;
+  resize: vertical;
+  padding: 0.8em;
+  border-radius: var(--round);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.custom-area:focus {
+  outline: none;
+  border-color: var(--main);
+}
+.modal-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
 .home-hint {
   opacity: 0.8;
 }

@@ -25,10 +25,15 @@ Write the minimum code that solves the actual problem. Nothing speculative.
 - No unrequested features, no premature abstraction, no "flexible" config that
   nobody asked for.
 - **If 200 lines could be 50, rewrite it.** Fewer moving parts = fewer bugs.
-- This project deliberately has **no backend and no UI framework dependencies**
-  beyond React + Zustand. Sounds are synthesized (no audio files); charts are
-  hand-rolled SVG (no chart lib); persistence is `localStorage`. Keep it that way
+- This project deliberately has **no UI framework dependencies beyond React +
+  Zustand**. Sounds are synthesized (no audio files); charts are hand-rolled SVG
+  (no chart lib); persistence is **local-first** `localStorage`. Keep it that way
   unless a real need forces otherwise.
+- There IS an **optional** tiny backend (`server.mjs`) that stores global
+  rankings/sessions via `/api/sessions` and `/api/rankings`. It is best-effort:
+  the store uploads in the background and silently falls back to local data when
+  offline. `localStorage` remains the source of truth — never make a flow *depend*
+  on the server. Don't grow this into a heavy backend.
 
 ### 3. Surgical Changes
 Touch only what you must. Every changed line should trace directly to the request.

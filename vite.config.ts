@@ -10,7 +10,8 @@ declare const process: { env: Record<string, string | undefined> }
 export default defineConfig({
   base: process.env.BASE_PATH || '/',
   plugins: [react()],
-  server: { port: 5173, host: true, open: false },
+  // `.trycloudflare.com` allows any quick-tunnel subdomain (URL rotates each run).
+  server: { port: 5173, host: true, open: false, allowedHosts: ['.trycloudflare.com'] },
   preview: { port: 4173, host: true },
   build: { target: 'es2020', sourcemap: false },
 })

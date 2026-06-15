@@ -43,7 +43,11 @@ export function ResultsPage() {
   const rawSeries = meta.mode === 'ko' ? result.samples.map((s) => s.rawCpm ?? s.raw) : result.samples.map((s) => s.raw)
 
   const typeLabel =
-    meta.genre === 'drill' ? `${MODE_LABELS[meta.mode]} · 오답` : `${MODE_LABELS[meta.mode]} · ${GENRE_LABELS[meta.genre]}`
+    meta.genre === 'drill'
+      ? `${MODE_LABELS[meta.mode]} · 오답`
+      : meta.genre === 'custom'
+        ? `${MODE_LABELS[meta.mode]} · 내 글`
+        : `${MODE_LABELS[meta.mode]} · ${GENRE_LABELS[meta.genre]}`
 
   return (
     <div className="screen results">

@@ -4,7 +4,7 @@ import { ConfigBar } from '../components/ConfigBar'
 import { TypingArea } from '../components/TypingArea'
 
 export function PracticePage() {
-  const { config, queue, index, drill, runId, reroll, finishPractice } = useNav()
+  const { config, queue, index, drill, custom, runId, reroll, finishPractice } = useNav()
 
   let target: string
   let meta: PracticeMeta
@@ -12,7 +12,21 @@ export function PracticePage() {
   let subtitle: string | undefined
   let badge: string | undefined
 
-  if (drill) {
+  if (custom) {
+    target = custom.text
+    title = '내 글 연습'
+    subtitle = '직접 붙여넣은 글 · 기록·랭킹에는 반영되지 않아요'
+    badge = '내 글'
+    meta = {
+      mode: custom.language,
+      language: custom.language,
+      genre: 'custom',
+      textId: 'custom',
+      textTitle: '내 글 연습',
+      text: custom.text,
+      isDrill: false,
+    }
+  } else if (drill) {
     target = drill.text
     title = drill.title
     subtitle = '틀린 단어 집중 연습'
