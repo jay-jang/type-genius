@@ -1,6 +1,9 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { useNav } from '../app/nav'
 import { useAppStore } from '../store/useAppStore'
 import { LineChart } from '../components/LineChart'
+import { weakUnits, buildWeaknessDrill } from '../lib/weakness'
+import type { Language } from '../types'
 import {
   improvementSeries,
   recentSessions,
@@ -34,6 +37,7 @@ export function ProfilePage() {
   const clearProfileSessions = useAppStore((s) => s.clearProfileSessions)
   const exportData = useAppStore((s) => s.exportData)
   const importData = useAppStore((s) => s.importData)
+  const { space, startDrill } = useNav()
 
   const [newName, setNewName] = useState('')
   const [backupMsg, setBackupMsg] = useState<{ ok: boolean; text: string } | null>(null)
@@ -77,6 +81,13 @@ export function ProfilePage() {
   const series = currentId ? improvementSeries(sessions, currentId) : []
   const recent = currentId ? recentSessions(sessions, currentId) : []
   const xpPct = Math.round((summary.xpInLevel / summary.xpForNextLevel) * 100)
+
+  // The weakness card analyzes one concrete language. 복합(mixed) folds into Korean.
+  const weakLang: Language = space === 'en' ? 'en' : 'ko'
+  const units = useMemo(
+    () => weakUnits(sessions, currentId, weakLang),
+    [sessions, currentId, weakLang],
+  )
 
   return (
     <div className="screen profile">
@@ -153,6 +164,33 @@ export function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Weak keys / jamo */}
+      {units.length > 0 && (
+        <div className="card weak-card">
+          <div className="card-head">
+            <span>약한 키 ({weakLang === 'ko' ? '자모' : '키'})</span>
+          </div>
+          <div className="weak-chips">
+            {units.map((u) => (
+              <span className="weak-chip" key={u.unit}>
+                <b>{u.unit}</b>
+                <i>{u.count}</i>
+              </span>
+            ))}
+          </div>
+          <button
+            className="btn accent weak-drill-btn"
+            onClick={() => {
+              const text = buildWeaknessDrill(units, weakLang)
+              if (!text) return
+              startDrill({ text, language: weakLang, title: '약점 집중 연습', sourceTextId: 'weakness' })
+            }}
+          >
+            약점 집중 연습
+          </button>
+        </div>
+      )}
 
       {/* Theme */}
       <div className="card">

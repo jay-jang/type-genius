@@ -51,6 +51,8 @@ export interface SessionResult {
   errorCount: number
   maxCombo: number
   isDrill: boolean
+  /** Target characters at the positions the typist mistyped (whitespace excluded). Optional: old sessions lack it. */
+  errorChars?: string[]
   timestamp: number
 }
 

@@ -791,6 +791,35 @@ kbd {
   flex-wrap: wrap;
 }
 
+/* ---------------------------------------------------------- weak keys --- */
+.weak-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.weak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--sub-alt);
+  border-radius: var(--round);
+  padding: 0.35rem 0.7rem;
+}
+.weak-chip b {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.weak-chip i {
+  color: var(--sub);
+  font-size: 0.8rem;
+  font-style: normal;
+}
+.weak-drill-btn {
+  align-self: flex-start;
+}
+
 /* ------------------------------------------------------------- rankings --- */
 .rank-note {
   color: var(--sub);

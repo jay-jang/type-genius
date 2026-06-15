@@ -268,6 +268,9 @@ export function NavProvider({ children }: { children: ReactNode }) {
 
   const finishPractice = useCallback(
     (result: EngineResult, meta: PracticeMeta) => {
+      const errorChars = result.errorPositions
+        .map((pos) => meta.text[pos])
+        .filter((ch) => ch && ch.trim() !== '')
       recordSession({
         mode: meta.mode,
         language: meta.language,
@@ -285,6 +288,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
         errorCount: result.errorCount,
         maxCombo: result.maxCombo,
         isDrill: meta.isDrill,
+        errorChars,
       })
       setLastResult({ result, meta })
       setScreen('results')
