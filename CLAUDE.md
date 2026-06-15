@@ -79,18 +79,29 @@ src/
   lib/              PURE logic — no React
     hangul.ts       Hangul jamo decomposition + 타수 (keystroke) counting
     metrics.ts      WPM/CPM/accuracy/consistency math
-    stats.ts        leaderboard / summaries / XP derived from sessions
+    stats.ts        leaderboard / summaries / XP / isRanked, derived from sessions
     drill.ts        builds the "repeat your mistakes" practice text
+    weakness.ts     weak jamo/key analysis → adaptive focus drill (keybr-style)
+    activity.ts     comprehensive activity record (what game, how often)
+    achievements.ts derived achievement badges
+    arcade.ts       "산성비" falling-word game: IME-aware multi-target matcher
+    ghost.ts        ghost-racing pace + progress
     sound.ts        Web Audio synth engine (singleton `sound`)
     effects.ts      DOM particle / confetti / shake helpers (Web Animations API)
-  data/             static literary passages (generated.json + fallback.ts)
-  store/            Zustand store, persisted to localStorage
+  data/             static literary passages (generated.json + fallback.ts) + words.ts
+  store/            Zustand store, persisted to localStorage; + account auth/sync
   hooks/
     useTypingEngine.ts   the core engine: IME-aware input, metrics, completion
   app/nav.tsx       screen routing + practice-queue state (no router dep)
-  components/       TopBar, TypingArea, LineChart
-  pages/            Home, Library, Practice, Results, Rankings, Profile
+  components/       TopBar, TypingArea, LineChart, ConfigBar, BottomBar, Icons,
+                    AuthModal (login/signup), RaceTrack (ghost)
+  pages/            Home, Library, Practice, Results, Rankings, Profile,
+                    Arcade (산성비), Activity (활동 기록)
   styles/global.css single design-system stylesheet (CSS variables)
+server.mjs          zero-dep Node server: serves dist/ + account API
+                    (/api/auth/register|login, /api/me, /api/sync, /api/rankings).
+                    scrypt password hash + stateless HMAC token; data in
+                    server-data/ (gitignored). Local-first: client never depends on it.
 ```
 
 ## Critical correctness rules (don't regress these)
@@ -107,6 +118,16 @@ src/
   so fixing a mistake still costs accuracy — that's intended.
 - Effects/sound must respect `settings.effectsEnabled` / `settings.soundEnabled`.
   Audio must be (re)started from a user gesture (`sound.resume()`).
+- **산성비 (Acid Rain) is a SEPARATE input path** (`src/lib/arcade.ts` + `ArcadePage`),
+  not `useTypingEngine`. Keep it that way so the core IME engine can never regress
+  from arcade changes. Its multi-target matcher reuses `isCompositionCorrect` /
+  `decomposeToStrokes` for mid-composition Korean syllables.
+- **`stats.isRanked` gates the speed leaderboards/records/XP.** Drills, custom text,
+  and arcade are excluded (arbitrary difficulty would distort ranks). Any new
+  non-passage mode that shouldn't set speed records must be excluded there too.
+- **Accounts are optional + local-first.** `localStorage` stays the source of truth;
+  signing in syncs to `server.mjs` in the background. Never make a flow *depend* on
+  the server being reachable.
 
 ## Commands
 
